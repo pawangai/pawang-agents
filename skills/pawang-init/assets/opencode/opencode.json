@@ -1,0 +1,198 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "deepseek/deepseek-flash",
+  "small_model": "deepseek/deepseek-flash",
+  "permission": {
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.dev.vars": "deny",
+      "*.dev.vars.*": "deny",
+      "*.env.example": "allow",
+      "*.dev.vars.example": "allow"
+    },
+    "edit": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.dev.vars": "deny",
+      "*.dev.vars.*": "deny",
+      "*.env.example": "allow",
+      "*.dev.vars.example": "allow"
+    },
+    "bash": {
+      "git push*": "ask",
+      "git -C * push*": "ask",
+      "git*--force*": "ask",
+      "git reset --hard*": "ask"
+    },
+    "skill": {
+      "*": "deny",
+      "agents-md": "allow",
+      "interview": "allow"
+    }
+  },
+  "formatter": {
+    "prettier": {
+      "command": [
+        "bunx",
+        "prettier",
+        "--write",
+        "$FILE"
+      ],
+      "extensions": [
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs",
+        ".ts",
+        ".tsx",
+        ".json",
+        ".jsonc",
+        ".css",
+        ".html",
+        ".md",
+        ".yaml",
+        ".yml"
+      ]
+    },
+    "ruff": {
+      "command": [
+        "ruff",
+        "format",
+        "$FILE"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
+    },
+    "shfmt": {
+      "command": [
+        "shfmt",
+        "-w",
+        "$FILE"
+      ],
+      "extensions": [
+        ".sh",
+        ".bash"
+      ]
+    },
+    "taplo": {
+      "command": [
+        "taplo",
+        "format",
+        "$FILE"
+      ],
+      "extensions": [
+        ".toml"
+      ]
+    }
+  },
+  "mcp": {
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "git": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-server-git"
+      ]
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=GANTI_PROJECT_REF&read_only=true"
+    },
+    "supabasedocs": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?features=docs"
+    },
+    "neon": {
+      "type": "remote",
+      "url": "https://mcp.neon.tech/mcp?readonly=true"
+    },
+    "neondocs": {
+      "type": "remote",
+      "url": "https://mcp.neon.tech/mcp?category=docs"
+    },
+    "cloudflare": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "cfdocs": {
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    }
+  },
+  "tools": {
+    "github_*": false,
+    "git_*": false,
+    "context7_*": false,
+    "playwright_*": false,
+    "supabase_*": false,
+    "supabasedocs_*": false,
+    "neon_*": false,
+    "neondocs_*": false,
+    "cloudflare_*": false,
+    "cfdocs_*": false,
+    "browser_*": false
+  },
+  "agent": {
+    "build": {
+      "tools": {
+        "github_*": true,
+        "git_*": true,
+        "context7_*": true,
+        "supabase_*": true,
+        "supabasedocs_*": true,
+        "neon_*": true,
+        "neondocs_*": true,
+        "cloudflare_*": true,
+        "cfdocs_*": true
+      }
+    },
+    "explorer": {
+      "tools": {
+        "context7_*": true,
+        "supabasedocs_*": true,
+        "neondocs_*": true,
+        "cfdocs_*": true
+      }
+    },
+    "implementer": {
+      "tools": {
+        "context7_*": true,
+        "supabasedocs_*": true,
+        "neondocs_*": true,
+        "cfdocs_*": true
+      }
+    },
+    "verifier": {
+      "tools": {
+        "playwright_*": true
+      }
+    }
+  }
+}

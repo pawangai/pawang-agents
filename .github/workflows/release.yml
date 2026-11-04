@@ -1,0 +1,32 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tag harus valid dan sama dengan versi di semua manifest
+        run: node scripts/check-version.mjs "$GITHUB_REF_NAME"
+      - name: Validasi dan tes
+        run: |
+          node scripts/validate.mjs
+          npm test
+      - name: Bangun ZIP runtime (reproducible) dan checksum
+        run: node scripts/pack.mjs
+      - name: Buat draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FLAGS="--draft"
+          case "$GITHUB_REF_NAME" in *-*) FLAGS="--draft --prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            $FLAGS

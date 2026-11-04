@@ -1,0 +1,21 @@
+{
+  "name": "pawang",
+  "version": "0.1.29",
+  "description": "Workflow Pawang untuk agent coding: rencana, bangun, verifikasi, review, commit, dan batalkan. Jalankan skill pawang-init untuk memasang kit ke proyek.",
+  "author": {
+    "name": "Pawang"
+  },
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Pawang",
+    "shortDescription": "Workflow Pawang untuk agent coding",
+    "developerName": "Pawang",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Plan",
+      "Implement",
+      "Review"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "pawang-agents",
+  "version": "0.1.29",
+  "description": "Pawang agents: workflow Pawang sebagai Agent Skills (31 skill + pawang-init) untuk agent universal, OpenCode, Pi, dan Claude Code (marketplace).",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "agent-skills",
+    "workflow",
+    "pawang"
+  ],
+  "type": "module",
+  "bin": {
+    "pawang-agents": "scripts/install.mjs"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "build": "node scripts/build-plugin.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "release:check": "node scripts/check-version.mjs"
+  },
+  "files": [
+    "skills",
+    "agents",
+    "scripts",
+    ".claude-plugin",
+    ".codex-plugin",
+    "LICENSE",
+    "README.md"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}

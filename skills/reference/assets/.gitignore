@@ -1,0 +1,4 @@
+# Dokumen referensi sering berisi data pribadi: jangan di-commit.
+*
+!README.md
+!.gitignore

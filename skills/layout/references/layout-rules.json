@@ -1,0 +1,75 @@
+{
+  "_catatan": "Satu-satunya sumber aturan untuk scripts/check-layout.mjs. Ubah aturan di sini tanpa mengubah script. Pola regex ditulis sebagai string JSON (backslash digandakan).",
+
+  "ignore_dirs": ["node_modules", ".git", "dist", "build", "out", "coverage", ".wrangler", ".turbo", ".next", ".svelte-kit", ".output", "vendor"],
+
+  "naming_exempt_dirs": ["migrations", "drizzle", "public", "assets", "fixtures", "__snapshots__", "snapshots", "locales", "i18n", "generated"],
+
+  "exempt_stems": ["README", "LICENSE", "CHANGELOG", "CONTRIBUTING", "AGENTS", "CLAUDE", "GEMINI", "PRODUCT", "DESIGN", "SPEC", "CONTEXT", "GAME-DESIGN", "Dockerfile", "Makefile", "Procfile", "Jenkinsfile", "Gemfile", "Rakefile"],
+
+  "exempt_prefix_chars": ["_", "$", "+", "[", "(", "@"],
+
+  "pascal_ext": ["tsx", "jsx", "vue", "svelte"],
+
+  "forbidden_words": ["final", "copy", "backup", "old", "new", "temp", "tmp", "untitled", "draft", "wip"],
+
+  "digit_suffix_allow": ["oauth2", "s3", "base64", "md5", "sha256", "utf8", "i18n", "e2e", "d1", "r2", "k8s", "web3", "h2", "http2", "mp3", "mp4", "es2020", "es2022"],
+
+  "generic_names": ["utils", "util", "helpers", "helper", "misc", "common", "stuff", "temp", "tmp"],
+
+  "code_extensions": ["ts", "tsx", "js", "jsx", "mjs", "cjs", "mts", "cts", "vue", "svelte", "astro", "py", "go", "rs", "sh"],
+
+  "script_hint_prefixes": ["seed", "migrate", "setup", "generate", "backfill", "import", "export", "sync", "cleanup", "reset", "fix", "deploy", "build", "check"],
+
+  "root_allowed_dirs": {
+    "common": ["src", "scripts", "tests", "e2e", "docs", ".pawang", "public", "assets", "migrations", "drizzle", "supabase", "prisma"],
+    "monorepo": ["apps", "packages"],
+    "single": []
+  },
+
+  "root_allowed_file_patterns": [
+    "^README", "^LICENSE", "^CHANGELOG", "^CONTRIBUTING",
+    "^AGENTS\\.md$", "^CLAUDE\\.md$", "^GEMINI\\.md$", "^PRODUCT\\.md$", "^DESIGN\\.md$", "^CONTEXT\\.md$", "^GAME-DESIGN\\.md$", "^openapi\\.json$", "^env\\.example$",
+    "^package\\.json$", "^pnpm-lock\\.yaml$", "^pnpm-workspace\\.yaml$", "^package-lock\\.json$", "^yarn\\.lock$", "^bun\\.lockb?$", "^deno\\.jsonc?$", "^deno\\.lock$",
+    "^tsconfig.*\\.json$", "\\.config\\.[cm]?[jt]s$", "\\.config\\.json$", "\\.d\\.ts$",
+    "^wrangler\\.(jsonc?|toml)$", "^opencode\\.jsonc?$", "^biome\\.jsonc?$", "^turbo\\.json$", "^nx\\.json$", "^components\\.json$", "^knip\\.json", "^fallow\\.toml$",
+    "^Dockerfile", "^docker-compose", "^Makefile$", "^index\\.html$",
+    "^lefthook\\.yml$", "^renovate\\.json$", "^vercel\\.json$", "^netlify\\.toml$", "^fly\\.toml$", "^render\\.yaml$",
+    "^go\\.mod$", "^go\\.sum$", "^Cargo\\.(toml|lock)$", "^pyproject\\.toml$", "^requirements.*\\.txt$"
+  ],
+
+  "dir_moves": {
+    "monorepo": {
+      "database": "packages/database",
+      "db": "packages/database",
+      "contracts": "packages/contracts",
+      "schemas": "packages/contracts",
+      "shared": "packages/shared",
+      "common": "packages/shared",
+      "ui": "packages/shared/ui",
+      "design-system": "packages/shared/design-system",
+      "components": "packages/shared/ui (atau apps/<nama>/src/components kalau hanya dipakai satu app)",
+      "web": "apps/web",
+      "api": "apps/api",
+      "worker": "apps/worker",
+      "workers": "apps/<nama-worker>",
+      "server": "apps/api",
+      "client": "apps/web",
+      "frontend": "apps/web",
+      "backend": "apps/api",
+      "lib": "packages/shared/lib",
+      "utils": "packages/shared/lib (pecah per tema)",
+      "helpers": "packages/shared/lib (pecah per tema)"
+    },
+    "single": {
+      "database": "src/db",
+      "db": "src/db",
+      "components": "src/components",
+      "lib": "src/lib",
+      "utils": "src/lib (pecah per tema)",
+      "helpers": "src/lib (pecah per tema)",
+      "server": "src/server",
+      "client": "src/client"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "pawang-agents",
+  "interface": {
+    "displayName": "Pawang agents"
+  },
+  "plugins": [
+    {
+      "name": "pawang",
+      "source": "./",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

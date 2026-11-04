@@ -2,9 +2,9 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Setiap rilis wajib punya bagiannya di sini; workflow rilis memakainya sebagai deskripsi GitHub Release.
 
-## [Unreleased]
+## [0.1.30] - 2026-11-04
 
-Perbaikan dari review Goldfish (`egm-review`, Stage 5-8). Belum dirilis.
+Perbaikan dari dua putaran review: `egm-review` Stage 5-8 atas seluruh repo, lalu review isi 32 prosedur terhadap kit. Laporan keduanya ada di `repo-review.md` dan `procedure-review.md`.
 
 ### Diperbaiki
 

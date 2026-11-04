@@ -1,6 +1,6 @@
 {
   "name": "pawang",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "description": "Workflow Pawang untuk agent coding: rencana, bangun, verifikasi, review, commit, dan batalkan. Jalankan skill pawang-init untuk memasang kit ke proyek.",
   "author": {
     "name": "Pawang"

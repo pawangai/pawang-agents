@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { walk } from '../skills/pawang-init/scripts/init.mjs';
-import { EXTERNAL, AUTO_INVOKE } from './lib.mjs';
+import { EXTERNAL, AUTO_INVOKE, walk, parseFrontmatter } from './lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, 'skills');
@@ -17,16 +16,16 @@ for (const n of names) {
   const f = path.join(SKILLS, n, 'SKILL.md');
   if (!fs.existsSync(f)) { err(`${n}: SKILL.md tidak ada`); continue; }
   const t = fs.readFileSync(f, 'utf8');
-  const m = t.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!m) { err(`${n}: frontmatter tidak ditemukan`); continue; }
-  const fm = m[1];
-  const name = (fm.match(/^name:\s*(.+)$/m) || [])[1]?.trim();
-  const desc = (fm.match(/^description:\s*(.+)$/m) || [])[1]?.trim();
+  let fm;
+  try { fm = parseFrontmatter(t); } catch (e) { err(`${n}: frontmatter tidak valid: ${e.message}`); continue; }
+  if (!fm) { err(`${n}: frontmatter tidak ditemukan`); continue; }
+  const name = fm.name;
+  const desc = fm.description;
   if (name !== n) err(`${n}: name "${name}" tidak sama dengan nama folder`);
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(n) || n.length > 64) err(`${n}: nama folder tidak valid`);
   if (!desc) err(`${n}: description kosong`);
   else if (desc.length > 1024) err(`${n}: description ${desc.length} karakter (maks 1024)`);
-  const hasKey = /^disable-model-invocation:\s*true$/m.test(fm);
+  const hasKey = fm['disable-model-invocation'] === 'true';
   if (AUTO_INVOKE.has(n) && hasKey) err(`${n}: boleh dipicu model, hapus disable-model-invocation`);
   if (!AUTO_INVOKE.has(n) && !hasKey) err(`${n}: wajib disable-model-invocation: true (hanya lewat perintah)`);
   // Teks skill harus tidak bergantung lokasi: tanpa .agents/skills/<skill>/... dan <skill-dir> wajib dijelaskan.
@@ -38,9 +37,19 @@ for (const n of names) {
     if (txt.includes('<skill-dir>')) usesDir = true;
   }
   if (usesDir && !t.includes('`<skill-dir>` is the folder that contains this `SKILL.md`')) err(`${n}: memakai <skill-dir> tanpa catatan Paths di SKILL.md`);
-  for (const rel of walk(path.join(SKILLS, n)).filter((r) => r.endsWith('.mjs'))) {
+  for (const rel of walk(path.join(SKILLS, n)).filter((r) => /\.(m?js)$/.test(r))) {
     const r = spawnSync(process.execPath, ['--check', path.join(SKILLS, n, rel)], { encoding: 'utf8' });
     if (r.status !== 0) err(`${n}/${rel}: sintaks salah\n${r.stderr}`);
+  }
+}
+
+// Berkas agent hasil terjemahan tidak boleh memakai placeholder yang tidak didefinisikan di berkasnya sendiri.
+const agentsDir = path.join(ROOT, 'agents');
+if (fs.existsSync(agentsDir)) {
+  for (const f of fs.readdirSync(agentsDir).filter((x) => x.endsWith('.md')).sort()) {
+    const t = fs.readFileSync(path.join(agentsDir, f), 'utf8');
+    if (t.includes('<skill-dir>')) err(`agents/${f}: memakai <skill-dir>; agent tidak punya catatan Paths, pakai <skills-root>`);
+    if (t.includes('<skills-root>') && !t.includes('`<skills-root>` adalah folder')) err(`agents/${f}: memakai <skills-root> tanpa definisi`);
   }
 }
 
@@ -52,11 +61,16 @@ for (const e of EXTERNAL) {
   if (names.includes(e)) err(`skill "${e}" seharusnya eksternal, hapus dari skills/`);
   if (!cmds.includes(e)) err(`command OpenCode untuk skill eksternal "${e}" tidak ada`);
 }
-for (const n of names) if (n !== 'pawang-init' && !cmds.includes(n)) err(`skill "${n}" tanpa command OpenCode`);
+// Tidak ada pengecualian: setiap skill, termasuk pawang-init, harus punya command OpenCode.
+for (const n of names) if (!cmds.includes(n)) err(`skill "${n}" tanpa command OpenCode`);
 
 // Berkas turunan (agents/, manifest, marketplace) harus sinkron (dibangun oleh build-plugin.mjs).
 const chk = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'build-plugin.mjs'), '--check'], { encoding: 'utf8' });
 if (chk.status !== 0) err(`berkas turunan tidak sinkron\n${chk.stderr.trim()}`);
+
+// Versi di package.json dan semua manifest harus sama. Tanpa ini, loop lokal lolos pada keadaan yang digagalkan CI.
+const ver = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'check-version.mjs')], { encoding: 'utf8' });
+if (ver.status !== 0) err(`versi manifest tidak sinkron\n${ver.stderr.trim()}`);
 
 const notes = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'release-notes.mjs'), `v${JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version}`], { encoding: 'utf8' });
 if (notes.status !== 0) err(notes.stderr.trim());

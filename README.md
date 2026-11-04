@@ -10,24 +10,29 @@ Pawang adalah lapisan alur kerja untuk agent coding (rencana, bangun, verifikasi
 
 ## Dependensi eksternal
 
-Dua skill tidak dibundel di repo ini. Keduanya diambil dari [`pawangai/pawang-skills`](https://github.com/pawangai/pawang-skills):
+Tiga skill tidak dibundel di repo ini. Ketiganya diambil dari [`pawangai/pawang-skills`](https://github.com/pawangai/pawang-skills):
 
 | Skill | Dipakai oleh |
 | --- | --- |
 | `interview` | `AGENTS.md` dan hampir semua skill, setiap kali agent perlu bertanya ke user |
 | `pawang-skill-creator` | `advise`, `agents-md`; membuat dan mengaudit skill baru |
+| `plans-prototype` | `plan` (Path C), `adopt`; mengubah paket capture menjadi `01-PRD.md` sampai `04-edge-cases.md` yang dibaca `plan` |
 
 ```sh
-npx skills add pawangai/pawang-skills --skill interview --skill pawang-skill-creator
+npx skills add pawangai/pawang-skills --skill interview --skill pawang-skill-creator --skill plans-prototype
 ```
+
+**Paket capture** (`pawang-capture-*`) adalah ZIP opsional dari ekstensi Pawang Capture, atau sumber lain yang formatnya sama. Isinya `capture-report.md`, `design-tokens.md`, `design-tokens.json`, `kandidat-dokumen.md`, `pages.json`, dan `screens/*.png`. Paket itu bukti "apa yang ada sekarang" pada produk live, dipakai `/plan` dan `/design` sebagai bahan, bukan rencana. Repo ini tidak memproduksinya: format dan cara memakainya didefinisikan di skill `plans-prototype`.
 
 Di Claude Code dan Codex ini sudah tercakup oleh marketplace di bawah (plugin `pawang-skills`). Untuk pemasangan manual, pasang di folder skill yang sama dengan skill Pawang lain. `install.mjs` mencetak perintah ini di akhir, dan `pawang-init` mengingatkannya.
 
 ## Penting: skill butuh kit di proyek
 
-Skill adalah prosedur. Mereka membaca file yang hidup di proyek Anda: `AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, `.pawang/rules.md`, `.pawang/conventions/`, `.agents/pawang.json`. Kumpulan file itu disebut kit dan dipasang oleh `pawang-init` (atau `--init` pada installer). Tanpa kit, `/feature`, `/implement`, dan kawan-kawannya tidak punya aturan untuk dibaca.
+Skill adalah prosedur. Mereka membaca file yang hidup di proyek Anda: `AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, `.pawang/rules.md`, `.pawang/conventions/`, `.agents/pawang.json`. Kumpulan file itu disebut kit dan dipasang oleh `pawang-init` (atau `--init` pada installer). Tanpa kit, `/feature`, `/implement`, dan skill lain yang membaca aturan proyek tidak punya apa pun untuk dibaca.
 
 ## Pasang lewat marketplace
+
+Status verifikasi tiap jalur ada di [docs/harnesses.md](docs/harnesses.md#status-verifikasi); tabel itu satu-satunya tempatnya. Ringkasnya: yang diuji otomatis adalah build, struktur manifest, dan pemasangan lokal — bukan pemuatan oleh harness. Semua jalur di bawah ini bisa dicoba, tetapi belum ada yang dibuktikan memuat.
 
 **Claude Code**
 
@@ -48,7 +53,8 @@ codex plugin marketplace add pawangai/pawang-skills
 codex plugin add pawang-skills@pawang
 ```
 
-Pemuatan plugin di Codex sungguhan belum diuji.
+Lihat tabel status sebelum memakai jalur ini.
+
 
 **Pi**
 
@@ -62,9 +68,9 @@ Repo ini adalah paket Pi: `package.json` memuat `keywords: ["pi-package"]` dan `
 
 Catatan Pi:
 
-- Tidak ada perintah pendek `/feature`. Skill kita bertanda `disable-model-invocation: true`, dan menurut dokumentasi Pi skill seperti itu hanya tersedia lewat perintah `/skill:<nama>`. Prompt template Pi hanya memperluas teks, dan saya tidak menemukan cara di dokumentasinya untuk memanggil skill dari template, jadi template `/feature` tidak dibuat.
-- `pawang-skills` ikut membawa skill lain miliknya. Untuk memasang hanya `interview` dan `pawang-skill-creator`, sempitkan lewat objek `packages` di pengaturan Pi (lihat dokumentasi Pi Packages).
-- Pi tidak punya penegakan izin seperti `opencode.json`, dan dokumentasi yang saya baca tidak menyebut subagent bernama. Langkah subagent jatuh ke jalur cadangan: Anda diminta menjalankannya di sesi baru.
+- Tidak ada perintah pendek `/feature`. Skill kita bertanda `disable-model-invocation: true`, dan menurut dokumentasi Pi skill seperti itu hanya tersedia lewat perintah `/skill:<nama>`. Prompt template Pi hanya memperluas teks dan tidak bisa memanggil skill, jadi template `/feature` tidak dibuat.
+- `pawang-skills` ikut membawa skill lain miliknya. Untuk memasang hanya `interview`, `pawang-skill-creator`, dan `plans-prototype`, sempitkan lewat objek `packages` di pengaturan Pi (lihat dokumentasi Pi Packages).
+- Pi tidak punya penegakan izin seperti `opencode.json`, dan dokumentasinya tidak menyebut subagent bernama. Langkah subagent jatuh ke jalur cadangan: Anda diminta menjalankannya di sesi baru.
 - Skill proyek baru dimuat setelah proyek dipercaya (project trust). Dengan nama kembar, Pi menyimpan skill yang ditemukan pertama; jangan pasang paket yang sama di dua lokasi.
 
 Batasan di mode plugin: folder `assets/` milik skill `reference` (tempat gambar acuan desain) berada di cache plugin, jadi gambar yang Anda taruh di sana hilang saat plugin diperbarui. Untuk alur yang banyak memakai gambar acuan, pasang skill lewat installer ke dalam proyek.
@@ -112,7 +118,7 @@ Tidak ada paket zip per skill. Aplikasi chat tidak punya marketplace berbasis UR
 
 ## Daftar skill
 
-Semua skill dipanggil dengan nama yang sama sebagai perintah (`/feature`).
+Bentuk pemanggilan berbeda per harness: `/pawang:<nama>` di Claude Code lewat plugin, `/skill:<nama>` di Pi, `/<nama>` pada pemasangan lewat installer dan OpenCode. Tabel lengkapnya di [docs/harnesses.md](docs/harnesses.md#pasang).
 
 | Kelompok | Skill |
 | --- | --- |
@@ -121,7 +127,7 @@ Semua skill dipanggil dengan nama yang sama sebagai perintah (`/feature`).
 | Pahami dan review | `status`, `debug`, `audit`, `sync` |
 | Pulihkan dan rilis | `fix`, `rollback`, `incident`, `deps`, `auth`, `data`, `release` |
 | Tambahan | `handoff`, `runbook`, `layout`, `agents-md`, `advise`, `reference`, `agents` |
-| Eksternal | `interview`, `pawang-skill-creator` (dari `pawangai/pawang-skills`) |
+| Eksternal | `interview`, `pawang-skill-creator`, `plans-prototype` (dari `pawangai/pawang-skills`) |
 
 Alur utama: `/context` -> `/design` -> `/feature` -> `/implement` -> `/check` -> `/audit` -> `/complete`. Proyek yang sudah berjalan mulai dari `/adopt`; ide mentah dari `/assess`. Dokumen lengkap alur dan konfigurasi ada di kit: `.pawang/workflow.md`, `.pawang/rules.md`, `.agents/README.md`.
 
@@ -129,11 +135,15 @@ Alur utama: `/context` -> `/design` -> `/feature` -> `/implement` -> `/check` ->
 
 ```text
 skills/<nama>/SKILL.md      sumber kanonik (31 skill Pawang, plus pawang-init); dipakai apa adanya
+skills/agents/
+  assets/agents/*.md        templat persona (explorer, implementer, reviewer, verifier, build)
+  scripts/render.mjs        rakit templat jadi berkas agent; satu sumber izin subagent
+  scripts/install-agents.mjs  pasang subagent ke .opencode/agents proyek (dry-run default)
 skills/pawang-init/
   scripts/init.mjs          pasang kit ke proyek (dry-run default)
   assets/kit/               AGENTS.md, CONTEXT.md, DESIGN.md, .pawang/, .agents/pawang.json
-  assets/opencode/          .opencode/{commands,agents,plugins}, opencode.json
-agents/                     subagent format Claude Code (HASIL BUILD dari agent OpenCode)
+  assets/opencode/          .opencode/{commands,plugins}, opencode.json (subagent dirakit dari skill agents)
+agents/                     subagent format Claude Code (HASIL BUILD dari skills/agents/assets/agents)
 .claude-plugin/             plugin.json dan marketplace.json Claude Code (HASIL BUILD)
 .codex-plugin/              plugin.json Codex (HASIL BUILD)
 .agents/plugins/            marketplace.json Codex (HASIL BUILD)
@@ -142,8 +152,10 @@ scripts/build-plugin.mjs    bangun agents/ dan semua manifest dari sumber
 scripts/pack.mjs            ZIP runtime reproducible + SHA256SUMS.txt untuk rilis
 scripts/validate.mjs        cek frontmatter, kebebasan lokasi, command OpenCode, berkas turunan, lisensi
 scripts/check-version.mjs   cocokkan tag rilis dengan versi di semua manifest
+scripts/release-notes.mjs   ambil bagian CHANGELOG untuk deskripsi GitHub Release
+scripts/lib.mjs             fungsi bersama skrip repo (walk, frontmatter, versi, daftar eksternal)
 tests/                      tes unit (node --test)
-docs/harnesses.md           pemetaan harness, manifest, path, subagent
+docs/harnesses.md           pemetaan harness, manifest, path, subagent, status verifikasi
 .github/workflows/          tests.yml (tiap push), release.yml (tag v*)
 ```
 
@@ -172,7 +184,9 @@ ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun repr
 
 ## Asal-usul
 
-Diturunkan dari arsip `pawang-v0_1_30.zip`. Folder di dalam arsip itu berlabel `pawang-v0.1.29` dan `README.md`-nya menyebut v0.1.29, jadi versi paket ini mengikuti 0.1.29. Perbedaan dari sumber: `pawang-init` (baru); `interview` dan `skill-creator` dikeluarkan (kini dari `pawangai/pawang-skills`, dengan nama `pawang-skill-creator`); rujukan `.agents/skills/<skill>/` di teks skill dan kit diganti `<skill-dir>` atau nama skill agar tidak bergantung lokasi; `disable-model-invocation: true` ditulis di frontmatter sumber.
+Titik awal repo ini adalah arsip `pawang-v0_1_30.zip`. Folder di dalam arsip itu berlabel `pawang-v0.1.29` dan `README.md`-nya menyebut v0.1.29; label arsip dan label isi tidak sama, dan `package.json` mengikuti label isi, `0.1.29`. Perbedaan dari arsip itu: `pawang-init` (baru); `interview` dan `skill-creator` dikeluarkan (kini dari `pawangai/pawang-skills`, dengan nama `pawang-skill-creator`); `plans-prototype` ditambahkan sebagai skill eksternal; rujukan `.agents/skills/<skill>/` di teks skill dan kit diganti `<skill-dir>` atau nama skill agar tidak bergantung lokasi; `disable-model-invocation: true` ditulis di frontmatter sumber.
+
+**Sejak 0.1.29, repo ini adalah hulu.** Arsip itu titik awal, bukan sumber yang dilacak: tidak ada repo upstream yang di-diff, tidak ada sinkronisasi otomatis, dan perubahan isi skill dilakukan di sini lalu dirilis lewat tag. `pawangai/pawang-skills` terpisah dan hanya memasok tiga skill eksternal yang disebut di atas.
 
 Kustomisasi sebelum dipakai: `opencode.json` (model dan server MCP; kunci lewat variabel lingkungan, lihat `env.example`), dan bagian `## Commands` di `AGENTS.md` yang bawaannya untuk Hono + Cloudflare Workers + Bun.
 

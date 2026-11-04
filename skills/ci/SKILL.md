@@ -120,7 +120,7 @@ before writing the push trigger instead of guessing. Preserve all other workflow
 files. When another workflow overlaps, report the overlap and ask whether to
 reuse, align, or leave it alone.
 
-## Step 3b - offer a local pre-push hook (opt-in)
+### Step 3b - offer a local pre-push hook (opt-in)
 
 After the workflow exists, ask one question and default to no:
 

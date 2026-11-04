@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Hasilkan berkas turunan yang dibutuhkan agar repo ini menjadi plugin Claude Code dan Codex:
-//   agents/*.md                       subagent format Claude Code, diterjemahkan dari agent OpenCode
+//   agents/*.md                       subagent format Claude Code, diterjemahkan dari templat skills/agents/assets/agents/
 //   .claude-plugin/plugin.json        manifest plugin Claude Code
 //   .claude-plugin/marketplace.json   katalog Claude Code
 //   .codex-plugin/plugin.json         manifest plugin Codex
@@ -11,16 +11,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { walk } from '../skills/pawang-init/scripts/init.mjs';
-import { ROOT, EXTERNAL, EXTERNAL_REPO, version } from './lib.mjs';
+import { renderAll as renderAgents } from '../skills/agents/scripts/render.mjs';
+import { ROOT, EXTERNAL, EXTERNAL_REPO, version, walk } from './lib.mjs';
 
-const OC_AGENTS = path.join(ROOT, 'skills', 'pawang-init', 'assets', 'opencode', '.opencode', 'agents');
+// Sumber persona: templat milik skill `agents`. Satu sumber untuk /agents, installer --opencode, dan build ini.
 const PLUGIN_NAME = 'pawang';
 // Agent utama OpenCode (build) tidak dikirim: di harness lain sesi utama berperan sebagai orkestrator.
 const SKIP_AGENTS = new Set(['build']);
 const DESCRIPTION = 'Workflow Pawang untuk agent coding: rencana, bangun, verifikasi, review, commit, dan batalkan. Jalankan skill pawang-init untuk memasang kit ke proyek.';
 
-// Terjemahkan agent OpenCode (izin di frontmatter) menjadi file agen format Claude Code.
+// Terjemahkan templat persona (skills/agents/assets/agents/*.md, sudah dirakit render.mjs) menjadi file agen Claude Code.
 export function parseAgent(text) {
   const m = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!m) throw new Error('frontmatter agent tidak valid');
@@ -36,16 +36,43 @@ export function parseAgent(text) {
   return { description, edit, hasBash: bashBlock !== undefined, rules, body: m[2].replace(/^\n+/, '') };
 }
 
+// Peta nama berkas skrip -> nama skill pemiliknya. Pola glob OpenCode (`node .agents/skills/*/scripts/x.mjs*`)
+// tidak bisa diterjemahkan apa adanya ke harness lain: `*` bukan nama skill. Petakan ke skill sebenarnya.
+export function scriptOwners() {
+  const map = new Map();
+  const skills = path.join(ROOT, 'skills');
+  for (const s of fs.readdirSync(skills)) {
+    const dir = path.join(skills, s, 'scripts');
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) map.set(f, s);
+  }
+  return map;
+}
+
 export function toClaudeAgent(name, text) {
   const a = parseAgent(text);
   const tools = ['Read', 'Grep', 'Glob'];
   if (a.edit !== 'deny') tools.push('Edit', 'Write');
   if (a.hasBash) tools.push('Bash');
   const secret = (p) => p.includes('.env') || p.includes('.dev.vars');
-  const show = (p) => '`' + p.replace('node .agents/skills/*/scripts/', 'node <skill-dir>/../<skill>/scripts/') + '`';
+  const hasSecretDeny = a.rules.some((r) => r.action === 'deny' && secret(r.pattern));
+  const owners = scriptOwners();
+  let usesSkillsRoot = false;
+  // Gagalkan build, bukan membuang pola diam-diam: pola yang hilang dari daftar izin tidak terlihat oleh siapa pun.
+  const show = (p) => {
+    const glob = p.match(/^node \.agents\/skills\/\*\/scripts\/([^\/]+?)(\*?)$/);
+    if (glob) {
+      const skill = owners.get(glob[1]);
+      if (!skill) throw new Error(`pola "${p}" tidak bisa diterjemahkan: tidak ada skill yang punya scripts/${glob[1]}`);
+      usesSkillsRoot = true;
+      return '`node <skills-root>/' + skill + '/scripts/' + glob[1] + glob[2] + '`';
+    }
+    if (p.includes('.agents/skills/')) throw new Error(`pola "${p}" bergantung lokasi dan tidak bisa diterjemahkan`);
+    return '`' + p + '`';
+  };
   const base = a.rules.find((r) => r.pattern === '*')?.action;
-  const allow = a.rules.filter((r) => r.action === 'allow' && r.pattern !== '*').map((r) => show(r.pattern));
-  const deny = a.rules.filter((r) => r.action === 'deny' && r.pattern !== '*' && !secret(r.pattern)).map((r) => show(r.pattern));
+  const allow = a.rules.filter((r) => r.action === 'allow' && r.pattern !== '*').map((r) => show(r.pattern)).filter(Boolean);
+  const deny = a.rules.filter((r) => r.action === 'deny' && r.pattern !== '*' && !secret(r.pattern)).map((r) => show(r.pattern)).filter(Boolean);
   let extra = '';
   if (a.hasBash) {
     extra += '\n\n## Batas shell\n\nDaftar ini turunan dari izin OpenCode. Di Claude Code ia berlaku sebagai aturan kerja, bukan penegakan oleh harness.\n';
@@ -53,6 +80,11 @@ export function toClaudeAgent(name, text) {
     else extra += '\n- Perintah di luar daftar diizinkan berikut mengikuti izin Claude Code milik user.';
     if (allow.length) extra += `\n- Diizinkan: ${allow.join(', ')}.`;
     if (deny.length) extra += `\n- Dilarang: ${deny.join(', ')}.`;
+    if (usesSkillsRoot) extra += '\n- `<skills-root>` adalah folder yang memuat skill Pawang terpasang: `.agents/skills/` pada pemasangan proyek, `skills/` pada mode plugin.';
+    // Pola deny rahasia bukan pola perintah shell, tapi larangannya tidak boleh hilang saat diterjemahkan.
+    if (hasSecretDeny) extra += '\n- Berkas rahasia (`.env*`, `.dev.vars*`) tidak boleh dibaca, diedit, ditampilkan, atau disentuh lewat shell, termasuk lewat `cat`, `grep`, atau `head`; hanya `*.example` yang boleh dibaca.';
+    // Izin bash yang bergantung manajer paket sengaja tidak dirakit: build tidak tahu proyek pengguna.
+    if (base !== 'deny') extra += '\n- Perintah test, lint, build, dan E2E: jalankan yang ada di `package.json` proyek dengan manajer paket yang dipakai proyek itu.';
     extra += '\n';
   }
   const fm = ['---', `name: ${name}`, `description: ${JSON.stringify(a.description)}`, `tools: ${tools.join(', ')}`, '---', ''].join('\n');
@@ -64,10 +96,11 @@ const json = (o) => ({ data: Buffer.from(JSON.stringify(o, null, 2) + '\n'), mod
 export function build() {
   const v = version();
   const files = new Map();
-  for (const f of fs.readdirSync(OC_AGENTS).filter((x) => x.endsWith('.md')).sort()) {
-    const name = f.replace(/\.md$/, '');
+  // Manajer paket proyek pengguna tidak diketahui saat build. Karena itu izin bash yang bergantung
+  // manajer paket tidak dirakit di sini; badan agent memberi aturan prosa sebagai gantinya.
+  for (const [name, text] of renderAgents({ pm: 'npm', scripts: {}, includePrimary: true })) {
     if (SKIP_AGENTS.has(name)) continue;
-    files.set(path.join('agents', f), { data: Buffer.from(toClaudeAgent(name, fs.readFileSync(path.join(OC_AGENTS, f), 'utf8'))), mode: 0o644 });
+    files.set(path.join('agents', name + '.md'), { data: Buffer.from(toClaudeAgent(name, text)), mode: 0o644 });
   }
   files.set(path.join('.claude-plugin', 'plugin.json'), json({
     name: PLUGIN_NAME, version: v, description: DESCRIPTION, author: { name: 'Pawang' }, license: 'MIT',
@@ -79,7 +112,7 @@ export function build() {
     metadata: { description: 'Marketplace Pawang agents.', version: v },
     plugins: [
       { name: PLUGIN_NAME, source: './', description: DESCRIPTION, version: v, category: 'productivity' },
-      { name: 'pawang-skills', source: { source: 'github', repo: EXTERNAL_REPO }, description: `Skill eksternal yang dibutuhkan Pawang: ${EXTERNAL.join(' dan ')}.`, category: 'productivity' },
+      { name: 'pawang-skills', source: { source: 'github', repo: EXTERNAL_REPO }, description: `Skill eksternal yang dibutuhkan Pawang: ${EXTERNAL.length > 1 ? EXTERNAL.slice(0, -1).join(', ') + ', dan ' + EXTERNAL.at(-1) : EXTERNAL[0]}.`, category: 'productivity' },
     ],
   }));
   files.set(path.join('.codex-plugin', 'plugin.json'), json({

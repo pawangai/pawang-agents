@@ -19,5 +19,8 @@ Format hasil: satu baris per pemeriksaan: `PASS|FAIL|BLOCKED | perintah | ringka
 Daftar ini turunan dari izin OpenCode. Di Claude Code ia berlaku sebagai aturan kerja, bukan penegakan oleh harness.
 
 - Perintah di luar daftar diizinkan berikut mengikuti izin Claude Code milik user.
-- Diizinkan: `git status*`, `git diff*`, `bun run test*`, `bun test*`, `bun run lint*`, `bun run typecheck*`, `bun run check*`, `bun run build*`, `bun run e2e*`, `node <skill-dir>/../<skill>/scripts/check-layout.mjs*`, `node <skill-dir>/../<skill>/scripts/compare-text.mjs*`, `node <skill-dir>/../<skill>/scripts/docs-health.mjs*`.
+- Diizinkan: `git status*`, `git diff*`, `node <skills-root>/layout/scripts/check-layout.mjs*`, `node <skills-root>/reference/scripts/compare-text.mjs*`, `node <skills-root>/advise/scripts/docs-health.mjs*`, `node <skills-root>/reference/scripts/probe.mjs*`, `pdftotext*`, `pdftoppm*`, `pdffonts*`, `pdfinfo*`, `compare *`.
 - Dilarang: `git commit*`, `git push*`, `git reset*--hard*`, `git*--force*`.
+- `<skills-root>` adalah folder yang memuat skill Pawang terpasang: `.agents/skills/` pada pemasangan proyek, `skills/` pada mode plugin.
+- Berkas rahasia (`.env*`, `.dev.vars*`) tidak boleh dibaca, diedit, ditampilkan, atau disentuh lewat shell, termasuk lewat `cat`, `grep`, atau `head`; hanya `*.example` yang boleh dibaca.
+- Perintah test, lint, build, dan E2E: jalankan yang ada di `package.json` proyek dengan manajer paket yang dipakai proyek itu.

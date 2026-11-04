@@ -23,3 +23,5 @@ Daftar ini turunan dari izin OpenCode. Di Claude Code ia berlaku sebagai aturan 
 - Perintah di luar daftar diizinkan berikut mengikuti izin Claude Code milik user.
 - Diizinkan: `git status*`, `git diff*`.
 - Dilarang: `git commit*`, `git push*`, `git reset*--hard*`, `git*--force*`.
+- Berkas rahasia (`.env*`, `.dev.vars*`) tidak boleh dibaca, diedit, ditampilkan, atau disentuh lewat shell, termasuk lewat `cat`, `grep`, atau `head`; hanya `*.example` yang boleh dibaca.
+- Perintah test, lint, build, dan E2E: jalankan yang ada di `package.json` proyek dengan manajer paket yang dipakai proyek itu.

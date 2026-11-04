@@ -2,7 +2,7 @@
 
 Read this for where workflow state lives and how specs work. Running a command does not require it: each command reads its own `SKILL.md`. It is kept out of `AGENTS.md` so it is not loaded every session.
 
-Project memory is the standard files at the repo root: `AGENTS.md`, `CONTEXT.md`, `DESIGN.md` at the root, and `.pawang/rules.md` plus `.pawang/conventions/` (owners and read-when triggers are in the `AGENTS.md` table). Each work item's spec, findings, and review live in `.pawang/specs/`. This folder holds only the workflow itself: `skills/` (procedures), `pawang.json` (settings), and this file. Workflow state lives in `.pawang/`; there is no chat log or run history.
+Project memory is the standard files at the repo root: `AGENTS.md`, `CONTEXT.md`, `DESIGN.md` at the root, and `.pawang/rules.md` plus `.pawang/conventions/` (owners and read-when triggers are in the `AGENTS.md` table). Each work item's spec, findings, and review live in `.pawang/specs/`. This folder holds the workflow settings (`pawang.json`) and this file. The procedures themselves live in a sibling `skills/` folder when the installer or a plugin put them inside the project (`.agents/skills/`); a package install keeps them elsewhere. Resolve a skill by name, never by a fixed path. Workflow state lives in `.pawang/`; there is no chat log or run history.
 
 ## Where state lives
 

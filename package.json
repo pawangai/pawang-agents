@@ -3,6 +3,9 @@
   "version": "0.1.29",
   "description": "Pawang agents: workflow Pawang sebagai Agent Skills (31 skill + pawang-init) untuk agent universal, OpenCode, Pi, dan Claude Code (marketplace).",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "keywords": [
     "pi-package",
     "agent-skills",
@@ -25,6 +28,7 @@
     "scripts",
     ".claude-plugin",
     ".codex-plugin",
+    ".agents/plugins",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"

@@ -57,7 +57,7 @@ Take the first non-empty group; for majors, one dependency per batch. State: pac
 
 Mark an advisory `accepted` or a package held only when the user says so; repeat their reason in a few words in the report. Nothing is persisted: if the hold must survive the session, tell the user to record it where they keep such decisions (for example a comment next to the dependency in the manifest).
 
-## Step 5 - report
+## Step 6 - report
 
 At most ten lines: counts per group, open advisories, held packages, the proposed batch with its next command, and what could not be checked. Say that an audit only finds known advisories.
 

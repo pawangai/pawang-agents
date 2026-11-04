@@ -8,11 +8,15 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { walk } from '../skills/pawang-init/scripts/init.mjs';
-import { ROOT, version } from './lib.mjs';
+import { ROOT, version, walk } from './lib.mjs';
 
 const args = process.argv.slice(2);
-const out = path.resolve(ROOT, args.includes('--out') ? args[args.indexOf('--out') + 1] : 'dist');
+const outFlag = args.indexOf('--out');
+if (outFlag >= 0 && (!args[outFlag + 1] || args[outFlag + 1].startsWith('--'))) {
+  console.error('--out butuh nilai folder');
+  process.exit(1);
+}
+const out = path.resolve(ROOT, outFlag >= 0 ? args[outFlag + 1] : 'dist');
 const FIXED = new Date('2026-01-01T00:00:00Z');
 const LICENSE = path.join(ROOT, 'LICENSE');
 

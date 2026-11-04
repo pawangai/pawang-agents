@@ -35,13 +35,44 @@ test('skill yang sudah ada dilewati kecuali --force', () => {
   assert.notEqual(fs.readFileSync(f, 'utf8'), 'diubah');
 });
 
+test('--opencode merakit subagent dari templat dengan manajer paket proyek', () => {
+  const d = tmp();
+  fs.writeFileSync(path.join(d, 'package.json'), JSON.stringify({ scripts: { test: 'x', build: 'y' } }));
+  fs.writeFileSync(path.join(d, 'pnpm-lock.yaml'), '');
+  const r = run('scripts/install.mjs', ['--project', d, '--skills', 'advise', '--opencode']);
+  assert.equal(r.status, 0, r.stderr);
+  const v = read(d, '.opencode/agents/verifier.md');
+  assert.match(v, /"pnpm run test\*": allow/);
+  assert.doesNotMatch(v, /"bun /, 'manajer paket tidak boleh di-hardcode');
+  assert.doesNotMatch(v, /\{\{/, 'placeholder tersisa');
+  // Agent utama ikut dipasang installer, dan izin proyeknya juga mengikuti manajer paket.
+  assert.match(read(d, '.opencode/agents/build.md'), /"pnpm run build\*": allow/);
+});
+
+test('--global --init ditolak sebelum ada yang ditulis', () => {
+  const home = tmp();
+  const r = run('scripts/install.mjs', ['--global', '--init', ...base], { env: { ...process.env, HOME: home } });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /--global memasang skill untuk semua proyek/);
+  assert.deepEqual(fs.readdirSync(home), [], 'tidak boleh ada berkas yang ditulis');
+});
+
+test('flag butuh nilai ditolak, bukan diam-diam memakai default', () => {
+  const r = run('scripts/install.mjs', ['--target']);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /--target butuh nilai/);
+  const p = run('scripts/pack.mjs', ['--out']);
+  assert.equal(p.status, 1);
+  assert.match(p.stderr, /--out butuh nilai/);
+});
+
 test('skill eksternal ditolak dan perintah dependensi dicetak', () => {
   const d = tmp();
   const bad = run('scripts/install.mjs', ['--project', d, '--skills', 'interview']);
   assert.equal(bad.status, 1);
   assert.match(bad.stderr, /skill eksternal/);
   const ok = run('scripts/install.mjs', ['--project', d, ...base]);
-  assert.match(ok.stdout, /npx skills add pawangai\/pawang-skills --skill interview --skill pawang-skill-creator/);
+  assert.match(ok.stdout, /npx skills add pawangai\/pawang-skills --skill interview --skill pawang-skill-creator --skill plans-prototype/);
 });
 
 test('--init memasang kit dan --dry-run tidak menulis', () => {

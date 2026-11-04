@@ -21,12 +21,7 @@ permission:
     "git branch": allow
     "git branch --list*": allow
     "git worktree list*": allow
-    "bun run test*": allow
-    "bun test*": allow
-    "bun run typecheck*": allow
-    "bun run lint*": allow
-    "bun run verify*": allow
-    "bun run build*": allow
+{{ALLOW_PROJECT}}
     "node .agents/skills/*/scripts/*": allow
     "node scripts/*": allow
     "git push*": ask
@@ -34,10 +29,5 @@ permission:
     "git push* -f*": deny
     "git reset*--hard*": deny
     "git*--force*": deny
-    "* .env*": deny
-    "*/.env*": deny
-    "*:.env*": deny
-    "*'.env*": deny
-    '*".env*': deny
-    "*.dev.vars*": deny
+{{BASH_SECRET}}
 ---

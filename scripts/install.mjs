@@ -7,8 +7,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { walk, init } from '../skills/pawang-init/scripts/init.mjs';
-import { EXTERNAL, EXTERNAL_REPO } from './lib.mjs';
+import { init } from '../skills/pawang-init/scripts/init.mjs';
+import { renderAll as renderAgents, detectPm, readScripts } from '../skills/agents/scripts/render.mjs';
+import { EXTERNAL, EXTERNAL_REPO, walk } from './lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, 'skills');
@@ -17,6 +18,11 @@ const DEPS_CMD = `npx skills add ${EXTERNAL_REPO} ${EXTERNAL.map((s) => `--skill
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
 const val = (n, d) => { const i = args.indexOf(n); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
+// Flag yang butuh nilai tidak boleh diam-diam memakai default: pemanggil salah ketik akan menulis ke folder yang salah.
+for (const f of ['--target', '--project', '--skills']) {
+  const i = args.indexOf(f);
+  if (i >= 0 && (!args[i + 1] || args[i + 1].startsWith('--'))) { console.error(`${f} butuh nilai`); process.exit(1); }
+}
 if (flag('--help') || flag('-h')) {
   console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 5).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
   process.exit(0);
@@ -32,6 +38,11 @@ const all = fs.readdirSync(SKILLS).filter((n) => fs.existsSync(path.join(SKILLS,
 const picked = val('--skills') ? val('--skills').split(',').map((s) => s.trim()).filter(Boolean) : all;
 const unknown = picked.filter((s) => !all.includes(s));
 if (unknown.length) { console.error(`Skill tidak dikenal: ${unknown.join(', ')}${unknown.some((u) => EXTERNAL.includes(u)) ? ` (skill eksternal: ${DEPS_CMD})` : ''}`); process.exit(1); }
+// Divalidasi sebelum ada yang ditulis: menolak kombinasi ini setelah menyalin skill meninggalkan efek samping.
+if (flag('--init') && isGlobal) {
+  console.error('--global memasang skill untuk semua proyek, bukan kit. Kit proyek butuh folder proyek: pakai --project DIR --init.');
+  process.exit(1);
+}
 
 function install(kind) {
   const dirName = kind === 'claude' ? '.claude/skills' : '.agents/skills';
@@ -58,4 +69,18 @@ if (flag('--init')) {
 } else {
   console.log('Kit proyek (AGENTS.md, .pawang/, ...) belum dipasang. Jalankan lagi dengan --init, atau minta agent menjalankan skill pawang-init.');
 }
+// Subagent OpenCode dirakit dari templat milik skill `agents`, dengan manajer paket proyek tujuan.
+if (flag('--opencode')) {
+  const dir = path.join(project, '.opencode', 'agents');
+  const agents = renderAgents({ pm: detectPm(project), scripts: readScripts(project), includePrimary: true });
+  let written = 0, skipped = 0;
+  for (const [n, text] of agents) {
+    const dest = path.join(dir, n + '.md');
+    if (fs.existsSync(dest) && !force) { skipped++; continue; }
+    if (!dry) { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(dest, text); }
+    written++;
+  }
+  console.log(`${dry ? '[dry-run] ' : ''}subagent OpenCode: ${written} ${dry ? 'akan ditulis' : 'ditulis'}, ${skipped} dilewati`);
+}
+
 console.log(`\nDependensi eksternal (${EXTERNAL.join(', ')}) tidak ikut terpasang. Pasang dengan:\n  ${DEPS_CMD}`);

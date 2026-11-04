@@ -301,12 +301,22 @@ Run it after the implementation steps are done and `Verify` and any required
 `/check` pass. It reads the diff and the spec; it never edits code. Its writes are
 the findings ledger (Step 4) and the `## Review` block below.
 
-1. **Fix the target.** Compute the reviewed tree hash. It covers committed branch
-   work, uncommitted edits, and untracked files, but not workflow state (`CONTEXT.md`
-   and the files in `.pawang/specs/`), so ledger edits do not make a review stale:
+1. **Fix the target.** Compute the reviewed tree hash. Set `BRANCH` to the default
+   branch (for example `main`); the angle brackets below are a placeholder, not a
+   literal. The hash covers committed branch work, uncommitted edits, and untracked
+   files, but not session-scoped workflow state, so ledger and handoff edits do not
+   make a review stale. Excluded: `CONTEXT.md`, `.pawang/specs/`, `.pawang/handoff/`,
+   `.pawang/runbooks/`, `.pawang/assessments/`. `.pawang/decisions/` and
+   `.pawang/conventions/` stay in the hash on purpose: changing a rule or an Accepted
+   decision should invalidate the review.
 
-       (git diff <default-branch> -- . ':(exclude)CONTEXT.md' ':(exclude).pawang/specs'; \
-        git ls-files -o --exclude-standard -z | grep -zv '^.pawang/specs/' | xargs -0 -r git hash-object --) | git hash-object --stdin
+       BRANCH=main
+       WF=":(exclude)CONTEXT.md :(exclude).pawang/specs :(exclude).pawang/handoff :(exclude).pawang/runbooks :(exclude).pawang/assessments"
+       (git diff "$BRANCH" -- . $WF; \
+        git ls-files -o --exclude-standard -z \
+        | grep -zv -e '^\.pawang/specs/' -e '^\.pawang/handoff/' \
+                  -e '^\.pawang/runbooks/' -e '^\.pawang/assessments/' \
+        | xargs -0 -r git hash-object --) | git hash-object --stdin
 
 2. **Run the reviewer.** When the runtime can start the `reviewer` subagent
    (`.opencode/agents/reviewer.md`, installed by `/agents`), start it with a brief

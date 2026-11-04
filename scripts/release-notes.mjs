@@ -28,4 +28,4 @@ console.log(`${body}
 - Pi: \`pi install git:github.com/${repo}\`
 - Manual: \`node scripts/install.mjs --project <proyek> --init\`
 
-Skill \`interview\` dan \`pawang-skill-creator\` datang dari [pawangai/pawang-skills](https://github.com/pawangai/pawang-skills). Aset rilis: dua ZIP runtime (Claude Code dan Codex) dan \`SHA256SUMS.txt\`.`);
+Skill \`interview\`, \`pawang-skill-creator\`, dan \`plans-prototype\` datang dari [pawangai/pawang-skills](https://github.com/pawangai/pawang-skills). Aset rilis: dua ZIP runtime (Claude Code dan Codex) dan \`SHA256SUMS.txt\`.`);

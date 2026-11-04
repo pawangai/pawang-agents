@@ -30,6 +30,7 @@
     "skill": {
       "*": "deny",
       "agents-md": "allow",
+      "pawang-init": "allow",
       "interview": "allow"
     }
   },

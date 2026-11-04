@@ -21,3 +21,4 @@ Daftar ini turunan dari izin OpenCode. Di Claude Code ia berlaku sebagai aturan 
 
 - Shell hanya untuk pola berikut; selain itu jangan jalankan.
 - Diizinkan: `git status*`, `git diff*`, `git log*`, `git show*`.
+- Berkas rahasia (`.env*`, `.dev.vars*`) tidak boleh dibaca, diedit, ditampilkan, atau disentuh lewat shell, termasuk lewat `cat`, `grep`, atau `head`; hanya `*.example` yang boleh dibaca.

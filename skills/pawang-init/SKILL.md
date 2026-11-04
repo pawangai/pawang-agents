@@ -16,10 +16,10 @@ Skill Pawang lain (`/context`, `/feature`, `/implement`, ...) membaca file yang 
    ```
    node <skill-dir>/scripts/init.mjs "<path-proyek>"
    ```
-   Tambahkan `--opencode` bila user memakai OpenCode (menambah `.opencode/commands`, `agents`, `plugins`, dan `opencode.json`). Tambahkan `--claude` bila user memakai Claude Code (membuat `CLAUDE.md` berisi `@AGENTS.md`).
+   Tambahkan `--opencode` bila user memakai OpenCode (menambah `.opencode/commands`, `.opencode/plugins`, dan `opencode.json`). Subagent OpenCode tidak termasuk: pasang lewat skill `agents` (`node <skill-dir>/../agents/scripts/install-agents.mjs "<path-proyek>"`), yang mengisi izin dari `package.json` proyek. Tambahkan `--claude` bila user memakai Claude Code (membuat `CLAUDE.md` berisi `@AGENTS.md`).
 3. Setelah user setuju, jalankan lagi dengan `--apply`.
 4. File yang sudah ada dilaporkan `exists` dan tidak disentuh. Untuk `AGENTS.md`, `CONTEXT.md`, `DESIGN.md` yang sudah ada, gabungkan lewat `/adopt` atau `/agents-md`, bukan dengan menimpa. `.gitignore` hanya ditambah baris yang kurang. `opencode.json` yang sudah ada digabung manual: pertahankan model dan server MCP user, ambil blok `permission`.
-5. Skill `interview` dan `pawang-skill-creator` tidak dibundel; keduanya dari repo eksternal `pawangai/pawang-skills`. Bila belum ada, beri tahu user dan sarankan (butuh persetujuan karena memakai jaringan): Claude Code `/plugin install pawang-skills@pawang-agents`; Codex `codex plugin marketplace add pawangai/pawang-skills` lalu `codex plugin add pawang-skills@pawang`; agent lain `npx skills add pawangai/pawang-skills --skill interview --skill pawang-skill-creator`.
+5. Skill `interview`, `pawang-skill-creator`, dan `plans-prototype` tidak dibundel; ketiganya dari repo eksternal `pawangai/pawang-skills`. Bila belum ada, beri tahu user dan sarankan (butuh persetujuan karena memakai jaringan): Claude Code `/plugin install pawang-skills@pawang-agents`; Codex `codex plugin marketplace add pawangai/pawang-skills` lalu `codex plugin add pawang-skills@pawang`; agent lain `npx skills add pawangai/pawang-skills --skill interview --skill pawang-skill-creator --skill plans-prototype`.
 6. Laporkan hasilnya, lalu arahkan: `git init` bila belum ada repo; `/context` untuk proyek baru, `/adopt` bila kode sudah ada, `/design` bila ada UI.
 
 ## Aturan

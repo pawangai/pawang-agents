@@ -58,6 +58,9 @@ for (const n of names) if (n !== 'pawang-init' && !cmds.includes(n)) err(`skill 
 const chk = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'build-plugin.mjs'), '--check'], { encoding: 'utf8' });
 if (chk.status !== 0) err(`berkas turunan tidak sinkron\n${chk.stderr.trim()}`);
 
+const notes = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'release-notes.mjs'), `v${JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version}`], { encoding: 'utf8' });
+if (notes.status !== 0) err(notes.stderr.trim());
+
 if (!fs.existsSync(path.join(ROOT, 'LICENSE'))) err('LICENSE tidak ada');
 else if (!/^MIT License/.test(fs.readFileSync(path.join(ROOT, 'LICENSE'), 'utf8'))) err('LICENSE bukan MIT');
 if (JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).license !== 'MIT') err('package.json: license harus MIT');

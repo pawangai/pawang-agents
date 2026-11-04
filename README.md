@@ -154,7 +154,7 @@ Validasi dan tes: `node scripts/validate.mjs` dan `npm test` (Node 22+), keduany
 Rilis dibuat oleh `.github/workflows/release.yml` saat tag `vMAJOR.MINOR.PATCH` didorong.
 
 ```sh
-# 1. Ubah "version" di package.json (satu-satunya sumber versi), lalu bangun ulang manifest:
+# 1. Ubah "version" di package.json (satu-satunya sumber versi), tulis bagian "## [versi] - tanggal" di CHANGELOG.md, lalu bangun ulang manifest:
 node scripts/build-plugin.mjs
 # 2. Commit, beri tag, dorong:
 git add -A && git commit -m "chore: release 0.1.30"
@@ -162,13 +162,13 @@ git tag v0.1.30
 git push origin main v0.1.30
 ```
 
-Workflow memastikan format tag valid dan sama dengan versi di `package.json` serta semua manifest, menjalankan `validate.mjs` dan `npm test`, lalu membuat **draft** GitHub Release berisi:
+Workflow memastikan format tag valid dan sama dengan versi di `package.json` serta semua manifest, menjalankan `validate.mjs` (yang juga mewajibkan bagian CHANGELOG untuk versi itu) dan `npm test`, lalu langsung menerbitkan GitHub Release dengan deskripsi dari `CHANGELOG.md` (plus petunjuk pasang) dan aset:
 
 - `pawang-agents-claude-<versi>.zip`: manifest Claude Code, `agents/`, `skills/`, `LICENSE`
 - `pawang-agents-codex-<versi>.zip`: manifest Codex, `agents/`, `skills/`, `LICENSE`
 - `SHA256SUMS.txt`
 
-ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Periksa draft, lalu publikasikan. Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex).
+ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex).
 
 ## Asal-usul
 

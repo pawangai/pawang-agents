@@ -1,0 +1,197 @@
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 67eb257..7fb918c 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -20,13 +20,22 @@ jobs:
+           npm test
+       - name: Bangun ZIP runtime (reproducible) dan checksum
+         run: node scripts/pack.mjs
+-      - name: Buat draft GitHub Release
++      - name: Catatan rilis dari CHANGELOG.md
++        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
++      - name: Hapus draft lama untuk tag ini (bila ada)
+         env:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+-          FLAGS="--draft"
+-          case "$GITHUB_REF_NAME" in *-*) FLAGS="--draft --prerelease" ;; esac
++          IDS=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.draft and .tag_name == \"$GITHUB_REF_NAME\") | .id")
++          for id in $IDS; do gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/$id"; done
++      - name: Buat GitHub Release
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          FLAGS=""
++          case "$GITHUB_REF_NAME" in *-*) FLAGS="--prerelease" ;; esac
+           gh release create "$GITHUB_REF_NAME" dist/* \
+             --title "$GITHUB_REF_NAME" \
+-            --generate-notes \
++            --notes-file "$RUNNER_TEMP/notes.md" \
++            --verify-tag \
+             $FLAGS
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+new file mode 100644
+index 0000000..7c227a0
+--- /dev/null
++++ b/CHANGELOG.md
+@@ -0,0 +1,27 @@
++# Changelog
++
++Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Setiap rilis wajib punya bagiannya di sini; workflow rilis memakainya sebagai deskripsi GitHub Release.
++
++## [0.1.29] - 2026-11-04
++
++Rilis pertama pawang-agents: workflow Pawang v0.1.29 dikemas ulang sebagai Agent Skills.
++
++### Ditambahkan
++
++- 31 skill Pawang plus `pawang-init`, yang memasang kit proyek (`AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, `.pawang/`, `.agents/pawang.json`).
++- Plugin Claude Code dan Codex di root repo, lengkap dengan marketplace. Di Claude Code skill dipanggil sebagai `/pawang:<nama>`.
++- Paket Pi (`pi install git:...`); skill dipanggil dengan `/skill:<nama>`.
++- Overlay OpenCode (command, subagent, plugin, `opencode.json`) lewat `pawang-init --opencode`.
++- Empat subagent (`explorer`, `implementer`, `reviewer`, `verifier`) untuk Claude Code dan Codex, diterjemahkan dari agent OpenCode.
++- Installer (`scripts/install.mjs`), ZIP runtime yang reproducible, validasi, tes, dan workflow CI serta rilis.
++
++### Diubah dibanding Pawang asli
++
++- Teks skill dan kit tidak bergantung lokasi: `<skill-dir>` menggantikan path `.agents/skills/<skill>/`.
++- `disable-model-invocation: true` ditulis di frontmatter semua skill kecuali `agents-md` dan `pawang-init`.
++- `interview` dan `skill-creator` dikeluarkan dari repo ini. Keduanya kini dari `pawangai/pawang-skills` (`interview`, `pawang-skill-creator`).
++
++### Catatan
++
++- Pemuatan plugin di Claude Code, Codex, dan Pi sungguhan belum diuji.
++- Lisensi MIT.
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 13ecca1..0937dc8 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -10,4 +10,4 @@
+ 3. Commit perubahan sumber dan berkas turunan dalam satu commit. Dengan mengirim kontribusi, Anda setuju kontribusinya berlisensi MIT.
+ 4. Buka pull request dan isi templatnya. Jelaskan apa yang berubah dan kenapa; untuk perubahan perilaku skill, sebut skill dan harness yang terdampak.
+ 
+-Rilis (pemelihara): ubah `version` di `package.json`, jalankan `node scripts/build-plugin.mjs`, commit, lalu beri tag `vX.Y.Z` dan dorong tag itu. Workflow membuat draft release berisi ZIP runtime dan `SHA256SUMS.txt`; periksa lalu publikasikan.
++Rilis (pemelihara): ubah `version` di `package.json`, tambahkan bagian `## [X.Y.Z] - tanggal` di `CHANGELOG.md`, jalankan `node scripts/build-plugin.mjs`, commit, lalu beri tag `vX.Y.Z` dan dorong tag itu. Workflow langsung menerbitkan release berisi ZIP runtime, `SHA256SUMS.txt`, dan deskripsi dari CHANGELOG.
+diff --git a/README.md b/README.md
+index 491ed21..4bf4624 100644
+--- a/README.md
++++ b/README.md
+@@ -154,7 +154,7 @@ Validasi dan tes: `node scripts/validate.mjs` dan `npm test` (Node 22+), keduany
+ Rilis dibuat oleh `.github/workflows/release.yml` saat tag `vMAJOR.MINOR.PATCH` didorong.
+ 
+ ```sh
+-# 1. Ubah "version" di package.json (satu-satunya sumber versi), lalu bangun ulang manifest:
++# 1. Ubah "version" di package.json (satu-satunya sumber versi), tulis bagian "## [versi] - tanggal" di CHANGELOG.md, lalu bangun ulang manifest:
+ node scripts/build-plugin.mjs
+ # 2. Commit, beri tag, dorong:
+ git add -A && git commit -m "chore: release 0.1.30"
+@@ -162,13 +162,13 @@ git tag v0.1.30
+ git push origin main v0.1.30
+ ```
+ 
+-Workflow memastikan format tag valid dan sama dengan versi di `package.json` serta semua manifest, menjalankan `validate.mjs` dan `npm test`, lalu membuat **draft** GitHub Release berisi:
++Workflow memastikan format tag valid dan sama dengan versi di `package.json` serta semua manifest, menjalankan `validate.mjs` (yang juga mewajibkan bagian CHANGELOG untuk versi itu) dan `npm test`, lalu langsung menerbitkan GitHub Release dengan deskripsi dari `CHANGELOG.md` (plus petunjuk pasang) dan aset:
+ 
+ - `pawang-agents-claude-<versi>.zip`: manifest Claude Code, `agents/`, `skills/`, `LICENSE`
+ - `pawang-agents-codex-<versi>.zip`: manifest Codex, `agents/`, `skills/`, `LICENSE`
+ - `SHA256SUMS.txt`
+ 
+-ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Periksa draft, lalu publikasikan. Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex).
++ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex).
+ 
+ ## Asal-usul
+ 
+diff --git a/package.json b/package.json
+index 78ac8c1..cc6874b 100644
+--- a/package.json
++++ b/package.json
+@@ -26,7 +26,8 @@
+     ".claude-plugin",
+     ".codex-plugin",
+     "LICENSE",
+-    "README.md"
++    "README.md",
++    "CHANGELOG.md"
+   ],
+   "pi": {
+     "skills": [
+diff --git a/scripts/release-notes.mjs b/scripts/release-notes.mjs
+new file mode 100644
+index 0000000..f8df6cc
+--- /dev/null
++++ b/scripts/release-notes.mjs
+@@ -0,0 +1,31 @@
++#!/usr/bin/env node
++// Cetak deskripsi rilis untuk sebuah versi: bagian CHANGELOG.md yang sesuai, plus petunjuk pasang.
++//   node scripts/release-notes.mjs v0.1.29
++// Gagal (status 1) bila CHANGELOG.md tidak punya bagian berisi untuk versi itu.
++import fs from 'node:fs';
++import path from 'node:path';
++import { ROOT } from './lib.mjs';
++
++const version = (process.argv[2] || '').replace(/^refs\/tags\//, '').replace(/^v/, '');
++if (!version) { console.error('Pemakaian: node scripts/release-notes.mjs <tag atau versi>'); process.exit(1); }
++
++const changelog = fs.readFileSync(path.join(ROOT, 'CHANGELOG.md'), 'utf8');
++const esc = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
++const m = changelog.match(new RegExp(`^## \\[${esc}\\][^\\n]*\\n([\\s\\S]*?)(?=^## \\[|(?![\\s\\S]))`, 'm'));
++const body = m?.[1].trim();
++if (!body) {
++  console.error(`CHANGELOG.md tidak punya bagian berisi untuk versi ${version}. Tambahkan "## [${version}] - YYYY-MM-DD" beserta isinya.`);
++  process.exit(1);
++}
++
++const repo = process.env.GITHUB_REPOSITORY || 'pawangai/pawang-agents';
++console.log(`${body}
++
++## Pasang
++
++- Claude Code: \`/plugin marketplace add ${repo}\`, lalu \`/plugin install pawang@pawang-agents\`
++- Codex: \`codex plugin marketplace add ${repo}\`, lalu \`codex plugin add pawang@pawang-agents\`
++- Pi: \`pi install git:github.com/${repo}\`
++- Manual: \`node scripts/install.mjs --project <proyek> --init\`
++
++Skill \`interview\` dan \`pawang-skill-creator\` datang dari [pawangai/pawang-skills](https://github.com/pawangai/pawang-skills). Aset rilis: dua ZIP runtime (Claude Code dan Codex) dan \`SHA256SUMS.txt\`.`);
+diff --git a/scripts/validate.mjs b/scripts/validate.mjs
+index 0eddaa9..536a05f 100644
+--- a/scripts/validate.mjs
++++ b/scripts/validate.mjs
+@@ -58,6 +58,9 @@ for (const n of names) if (n !== 'pawang-init' && !cmds.includes(n)) err(`skill
+ const chk = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'build-plugin.mjs'), '--check'], { encoding: 'utf8' });
+ if (chk.status !== 0) err(`berkas turunan tidak sinkron\n${chk.stderr.trim()}`);
+ 
++const notes = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'release-notes.mjs'), `v${JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version}`], { encoding: 'utf8' });
++if (notes.status !== 0) err(notes.stderr.trim());
++
+ if (!fs.existsSync(path.join(ROOT, 'LICENSE'))) err('LICENSE tidak ada');
+ else if (!/^MIT License/.test(fs.readFileSync(path.join(ROOT, 'LICENSE'), 'utf8'))) err('LICENSE bukan MIT');
+ if (JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).license !== 'MIT') err('package.json: license harus MIT');
+diff --git a/tests/release.test.mjs b/tests/release.test.mjs
+new file mode 100644
+index 0000000..4984f0f
+--- /dev/null
++++ b/tests/release.test.mjs
+@@ -0,0 +1,23 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { run } from './helpers.mjs';
++import { version } from '../scripts/lib.mjs';
++
++test('release-notes: versi paket punya bagian berisi plus petunjuk pasang', () => {
++  const r = run('scripts/release-notes.mjs', [`v${version()}`], { env: { ...process.env, GITHUB_REPOSITORY: 'acme/demo' } });
++  assert.equal(r.status, 0, r.stderr);
++  assert.match(r.stdout, /### Ditambahkan/);
++  assert.match(r.stdout, /## Pasang/);
++  assert.match(r.stdout, /\/plugin marketplace add acme\/demo/);
++  assert.match(r.stdout, /pi install git:github\.com\/acme\/demo/);
++  assert.doesNotMatch(r.stdout, /^## \[/m); // hanya satu bagian
++});
++
++test('release-notes: tag dan versi polos sama; versi tanpa bagian gagal', () => {
++  const v = version();
++  assert.equal(run('scripts/release-notes.mjs', [v]).stdout, run('scripts/release-notes.mjs', [`refs/tags/v${v}`]).stdout);
++  const bad = run('scripts/release-notes.mjs', ['v99.0.0']);
++  assert.equal(bad.status, 1);
++  assert.match(bad.stderr, /tidak punya bagian/);
++  assert.equal(run('scripts/release-notes.mjs', []).status, 1);
++});

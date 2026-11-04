@@ -10,4 +10,4 @@
 3. Commit perubahan sumber dan berkas turunan dalam satu commit. Dengan mengirim kontribusi, Anda setuju kontribusinya berlisensi MIT.
 4. Buka pull request dan isi templatnya. Jelaskan apa yang berubah dan kenapa; untuk perubahan perilaku skill, sebut skill dan harness yang terdampak.
 
-Rilis (pemelihara): ubah `version` di `package.json`, jalankan `node scripts/build-plugin.mjs`, commit, lalu beri tag `vX.Y.Z` dan dorong tag itu. Workflow membuat draft release berisi ZIP runtime dan `SHA256SUMS.txt`; periksa lalu publikasikan.
+Rilis (pemelihara): ubah `version` di `package.json`, tambahkan bagian `## [X.Y.Z] - tanggal` di `CHANGELOG.md`, jalankan `node scripts/build-plugin.mjs`, commit, lalu beri tag `vX.Y.Z` dan dorong tag itu. Workflow langsung menerbitkan release berisi ZIP runtime, `SHA256SUMS.txt`, dan deskripsi dari CHANGELOG.

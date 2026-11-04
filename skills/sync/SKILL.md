@@ -15,7 +15,9 @@ Where this sits in the workflow:
 
 Agent-facing files go stale quietly: a script gets renamed, a dependency swapped, a token changed, and the file keeps telling agents the old story. This skill compares the files with each other and with the code.
 
-**Reads:** `AGENTS.md`, `CONTEXT.md`, `.pawang/specs/*.md`, `DESIGN.md`, `.pawang/conventions/`, `git log`, manifests and lockfiles, tooling configs, style and theme files, `openapi.json`.
+Resolve the default branch once at the start and use it everywhere below: `git symbolic-ref --short refs/remotes/origin/HEAD` when the remote HEAD is set, otherwise the branch `origin` tracks, otherwise ask. There is no `defaultBranch` key in `.agents/pawang.json`.
+
+**Reads:** `AGENTS.md`, `CONTEXT.md`, `.agents/README.md`, `.pawang/specs/*.md`, `DESIGN.md`, `.pawang/conventions/`, `git log`, manifests and lockfiles, tooling configs, style and theme files, `openapi.json`.
 
 **Writes:** `AGENTS.md` only, and only after approval. Every other file belongs to its owner (see the `AGENTS.md` table); `sync` proposes the exact edit and names the skill to run. It never edits code, never commits, and never runs build, test, or deploy commands.
 
@@ -25,7 +27,7 @@ Skip a check when its files do not exist and say so. Each finding records both s
 
 | # | Check | Side A | Side B |
 |---|---|---|---|
-| 1 | Commands | `AGENTS.md` Commands (dev, typecheck, build, lint, test, Verify, openapi) | scripts in `package.json`, `Makefile`, `pyproject.toml`, or equivalent |
+| 1 | Commands | `AGENTS.md` Commands (dev, typecheck, build, lint, test, Verify, openapi — `test` and `Verify` only when the project has them; testing is opt-in and `Verify` is added by `/ci`) | scripts in `package.json`, `Makefile`, `pyproject.toml`, or equivalent |
 | 2 | File index | `AGENTS.md` Project files table (it must list `.pawang/specs/`) | root files that exist; standard-named files not registered (for example `GAME-DESIGN.md`); registered files or folders that are missing |
 | 3 | Stack | `CONTEXT.md` section 4 | dependencies, lockfile, framework and host config (`wrangler.jsonc`, ORM config, auth library) |
 | 4 | Tokens | `DESIGN.md` front matter (colors, typography, rounded, spacing) | CSS variables, Tailwind or theme config; also run `npx -y @google/design.md lint DESIGN.md` when the network allows |
@@ -42,7 +44,7 @@ Do not guess which side is right. A mismatch between two product decisions (for 
 
 Present one table, most important first, and nothing else until it is shown:
 
-| ID | Severity | A says | B says | Owner | Proposed fix |
+| ID | Severity | A says | B says | Where read | Owner | Proposed fix |
 |---|---|---|---|---|---|
 
 Severities: `contradiction` (the files disagree and an agent would act wrongly), `stale` (one side outdated), `missing` (a needed fact is absent), `hygiene`. Mark `needs-decision` where either side could be right. State the count by owner and, when there is no drift, say so in one line.

@@ -16,7 +16,8 @@ Before the first rollback step:
    in `.pawang/specs/` is the only dirty path. Stop on drift.
 4. Preview the target's product diff while excluding the workflow paths
    `.agents/**`, `.opencode/**`, `opencode.json`, `AGENTS.md`, `CONTEXT.md`,
-   `.pawang/specs/**`, and the separately reviewed `DESIGN.md` and `.pawang/conventions/`.
+   `.pawang/**` (including `.pawang/rules.md`), and the separately reviewed
+   `DESIGN.md` and `.pawang/conventions/`.
    Confirm it is non-empty and matches the Product paths in the spec.
 5. Apply only the resolved product diff in reverse with three-way conflict
    detection. Use only the resolved full SHA values:

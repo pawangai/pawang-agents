@@ -49,7 +49,7 @@ Write `None` when there are none.
 
 ## Later-change risk
 
-**Classification:** No overlap | Overlap, likely compatible | Dependency risk
+**Classification:** No overlap | Overlap, likely compatible | Dependency risk | Blocked (stop before writing this spec)
 
 | Later commit | Shared path or contract | Required handling |
 | ------------ | ----------------------- | ----------------- |

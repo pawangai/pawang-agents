@@ -1,6 +1,6 @@
 ---
 name: incident
-description: Triage a production bug or incident report (log, error, tracker URL, user complaint) without touching production. Classifies severity, routes to /debug, /fix, or /rollback, and writes an incident record. Use for /incident, production is broken, users report an error, or post-deploy regression. Not for diagnosis alone (/debug), a local failing test (/debug), or planned features (/feature).
+description: Triage a production bug or incident report (log, error, tracker URL, user complaint) without touching production. Classifies severity, routes to /debug, /fix, /rollback, or /feature, and writes an incident record. Use for /incident, production is broken, users report an error, or post-deploy regression. Not for diagnosis alone (/debug), a local failing test (/debug), or a feature that is already planned (/feature). A report that turns out to be a missing feature is routed, not refused.
 disable-model-invocation: true
 ---
 
@@ -50,11 +50,11 @@ Unknown impact: assume the higher level until evidence says otherwise, and say s
 | Cause confirmed, small repair | `/fix "<bug and confirmed cause>"` |
 | S1 or wide impact right after a completed feature | `/rollback <feature>`; name the feature from `CONTEXT.md` and the `Feature:` trailer in `git log` (read-only) |
 | Leaked secret or exposed data | Tell the user to rotate or revoke it outside Pawang first, then `/fix` |
-| Actually a missing or planned feature | `/feature` |
+| Actually a missing or planned feature | `/feature "<feature title>"` |
 
 ## Step 4 - write the record
 
-Write `.pawang/incidents/<YYYY-MM-DD>-<slug>.md` (UTC date; slug is kebab-case, 2-4 words, `a-z0-9-` only). Never overwrite: if the file exists, append `-2`. Confirm `.pawang/incidents/` is not a symlink and stays inside the project.
+Write `.pawang/incidents/<YYYY-MM-DD>-<slug>.md` (UTC date; slug is kebab-case, 2-4 words, `a-z0-9-` only). Never overwrite: if the file exists, append `-2`. Confirm `.pawang/incidents/` is not a symlink and stays inside the project. If it is a symlink or resolves outside the project, stop and ask the user where the record should live instead of writing outside it.
 
     # Incident: <title>
 
@@ -68,7 +68,7 @@ Write `.pawang/incidents/<YYYY-MM-DD>-<slug>.md` (UTC date; slug is kebab-case, 
     - **Route:** <exact command> - <why>
     - **Prevention:** <missing test, check, monitoring, or doc; `TBD:` if unknown>
 
-When the user returns after the repair, update only Status and Prevention. Prevention items are proposals; turn one into `/fix` or `/tests` only if the user asks.
+When the user returns after the repair, update Status and Prevention, and update Cause and Route if `/debug` returned a verdict that changes them (they were `unknown` or `likely` when the record was written). Prevention items are proposals; turn one into `/fix` or `/tests` only if the user asks.
 
 ## Step 5 - report
 

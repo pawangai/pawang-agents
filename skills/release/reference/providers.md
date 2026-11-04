@@ -94,7 +94,9 @@ Creating a preview resource (`wrangler d1 create`, `kv namespace create`, `r2
 bucket create`, `hyperdrive create`) is a remote action: hand it to `/data`,
 which needs approval, and put the returned id into the block. Do not create it
 here. A Preview limit applies per Worker (100 on Free, 500 on paid, and 100
-deployments per Preview) *(confirm)*. To check the result, point to
+deployments per Preview) *(confirm)*. Treat those numbers as unconfirmed: state
+them as approximate and never present them to the user as fact until the
+Cloudflare docs say the same. To check the result, point to
 `/ci-deploy audit workers`.
 
 ## Render

@@ -8,7 +8,7 @@
 //
 // Prinsip: hanya MENAMBAH aturan yang belum ada. Aturan milik user tidak ditimpa.
 // File berisi komentar (JSONC) tidak ditulis ulang agar komentar tidak hilang.
-// Sintaks mengikuti https://opencode.ai/.pawang/permissions (aturan terakhir yang cocok menang).
+// Sintaks mengikuti https://opencode.ai/docs/permissions/ (aturan terakhir yang cocok menang).
 
 import fs from 'node:fs';
 import path from 'node:path';

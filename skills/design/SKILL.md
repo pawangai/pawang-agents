@@ -23,6 +23,8 @@ Where this sits in the workflow:
 
 ## Step 0 - decide the mode
 
+Prerequisite: `CONTEXT.md` exists. Step 0 reads section 5 and Step 2 reads users and tone from it. If it is missing, stop and send the user to `/context`; do not invent the missing facts.
+
 - `CONTEXT.md` section 5 says "No UI" (an API-only project): stop and say no `DESIGN.md` is needed. Create one only if the user insists.
 - `DESIGN.md` missing, or still the template (name `Project Name`, placeholder colors): **Create**.
 - `DESIGN.md` has real content: **Update**. Preserve the user's prose and decisions; change only what the survey or the user shows is wrong.
@@ -68,7 +70,13 @@ The prose carries the why, because tokens alone do not transfer judgment: the ro
 
 ## Step 4 - lint and fix
 
-Run `npx -y @google/design.md lint DESIGN.md`. It validates structure, token references, and contrast, and adds nothing to the project's dependencies. On Windows use `npx -y -p @google/design.md designmd lint DESIGN.md`. Fix every error (broken references, duplicate headings, contrast failures) and re-run until it passes; report remaining warnings. In Update mode, to check for regressions, save the previous version outside the repo (`git show HEAD:DESIGN.md`) and run the tool's `diff` command against it.
+Run `npx -y @google/design.md lint DESIGN.md`. It validates structure, token references, and contrast, and adds nothing to the project's dependencies. On Windows use `npx -y -p @google/design.md designmd lint DESIGN.md`. Fix every error (broken references and duplicate headings; the linter reports a
+contrast-ratio finding as a warning, so treat those as warnings and say so) and
+re-run until it passes; report what remains. In Update mode, to check for
+regressions, save the previous version outside the repo and run the tool's
+`diff` command against it. Use `git show HEAD:DESIGN.md` when `DESIGN.md` is
+tracked; when it is new and never committed, say the comparison is unavailable
+and skip it rather than failing the step.
 
 If `npx` cannot reach the registry, say so plainly and do a manual pass against the rules above; never claim the lint passed without running it.
 
@@ -82,7 +90,9 @@ Show what changed and where each token came from (file for extracted values, int
 - **Reflect reality, then taste.** Extract before choosing; interview only for decisions.
 - **Never invent intent.** Mark inferences `TODO (confirm)`.
 - **Lint before done.** A `DESIGN.md` that fails lint is not finished.
-- **One owner.** Other skills ask for `/design` instead of editing this file.
+- **Owner, with one exception.** Other skills ask for `/design` instead of
+  editing this file; `/adopt` may also write it when reconstructing a design from
+  an existing codebase (see the ownership table in `AGENTS.md`).
 
 ## Formatting
 

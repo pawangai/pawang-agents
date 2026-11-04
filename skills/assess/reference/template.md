@@ -25,6 +25,7 @@ Keyakinan keseluruhan: tinggi | sedang | rendah
 - **Prior art:** <temuan> - [sumber | ASSUMPTION]
 - **Konteks:** <temuan> - [sumber | ASSUMPTION]
 - **Data dan batasan:** <temuan> - [sumber | ASSUMPTION]
+- **Penilaian sebelumnya:** <assessment lama di .pawang/assessments/ dan apakah alasannya masih berlaku, atau tidak ada>
 
 ### Evidence Against
 

@@ -42,9 +42,9 @@ Telusuri lensa yang relevan, lewati yang tidak berlaku:
 2. **Prior art**: percobaan sebelumnya, fitur yang sudah ada di repo atau `git log`, pesaing, alternatif open source, dan mengapa berhasil atau gagal.
 3. **Konteks**: cara orang mengatasinya hari ini dan biaya bila tidak dibangun.
 4. **Data dan batasan**: angka, volume, hukum atau kepatuhan, batas platform.
-5. **Penilaian sebelumnya**: cek `.pawang/assessments/` untuk ide serupa yang pernah `kill` atau `needs-clarification`; bila ada, tampilkan alasannya dan tanyakan apakah masih berlaku.
+5. **Penilaian sebelumnya**: cek `.pawang/assessments/` untuk ide serupa yang pernah `kill` atau `needs-clarification`; bila ada, tampilkan alasannya dan tanyakan apakah masih berlaku, lalu catat hasilnya di baris `Penilaian sebelumnya` pada bagian **Evidence** (`reference/template.md`).
 
-Beri tiap temuan tingkat keyakinan `tinggi|sedang|rendah` dan `[sumber]` atau `ASSUMPTION`. Bagian **Bukti yang Menentang** wajib ada; bila tidak menemukan apa pun, tulis itu secara eksplisit. Gunakan pencarian web hanya bila tersedia, dan ikuti `reference/url-safety.md`.
+Beri tiap temuan tingkat keyakinan `tinggi|sedang|rendah` dan `[sumber]` atau `ASSUMPTION`. Pemetaan ke skor di langkah 5: keyakinan `tinggi` menjadi `kuat`, `sedang` menjadi `cukup`, `rendah` menjadi `lemah`. Temuan yang seluruhnya `ASSUMPTION` tidak bisa menjadi `kuat`. Bagian **Bukti yang Menentang** wajib ada; bila tidak menemukan apa pun, tulis itu secara eksplisit. Gunakan pencarian web hanya bila tersedia, dan ikuti `reference/url-safety.md`.
 
 ### 3. Rumuskan masalah (ruang masalah, bukan solusi)
 
@@ -60,7 +60,7 @@ Beri nilai tiap kriteria `kuat|cukup|lemah|tidak diketahui` dengan satu baris al
 
 | Verdict | Syarat |
 |---|---|
-| `go` | validitas masalah `cukup` atau lebih, **kekuatan bukti `cukup` atau lebih (tidak pernah `lemah` atau `tidak diketahui`)**, dan ada opsi konsep yang direkomendasikan |
+| `go` | validitas masalah `cukup` atau lebih, **kekuatan bukti `cukup` atau lebih (tidak pernah `lemah` atau `tidak diketahui`; dihitung dari pemetaan keyakinan di langkah 3)**, dan ada opsi konsep yang direkomendasikan |
 | `needs-clarification` | menjanjikan tapi terhambat; sebut pertanyaan penghambat dan tahap yang diulang (bukti, masalah, atau konsep) |
 | `kill` | tidak layak dibangun sekarang; sebut alasan penentunya terang-terangan (masalah lemah, ada alternatif lebih baik, biaya melebihi nilai, di luar cakupan) |
 

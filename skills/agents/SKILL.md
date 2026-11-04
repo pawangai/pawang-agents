@@ -17,7 +17,7 @@ Skill lain adalah prosedur (cara). Skill ini mendefinisikan pelaku (siapa menger
 node <skill-dir>/scripts/install-agents.mjs "<path-proyek>"           # dry-run: tampilkan rencana
 node <skill-dir>/scripts/install-agents.mjs "<path-proyek>" --apply   # setelah user setuju
 ```
-Menulis `.opencode/agents/{explorer,implementer,verifier,reviewer}.md` dari templat `<skill-dir>/../agents/assets/agents/`. Agent yang sudah didefinisikan di file md atau di bagian `agent` pada `opencode.json` dilewati. Izin `implementer` (typecheck, lint, test) dan `verifier` (ditambah build, E2E, `check-layout`, `compare-text`, `probe`, `pdftotext`, `pdftoppm`, `compare`) diisi dari `package.json` dan lockfile, jadi manajer paket mengikuti proyek. Blok penolakan rahasia dan git berasal dari satu sumber di skrip supaya tetap sinkron antar agent. Minta user commit hasilnya. Format file subagent OpenCode (frontmatter `description`, `mode: subagent`, `permission`; body = prompt; aturan izin: yang cocok TERAKHIR menang) sudah dicek ke dokumentasi resmi, tetapi periksa ulang bila OpenCode berubah.
+Menulis `.opencode/agents/{explorer,implementer,verifier,reviewer}.md` dari templat `<skill-dir>/assets/agents/`. Prasyarat: Node 18+ dan folder proyek yang bisa ditulis. Bila proyek tidak punya lockfile, `detectPm` memilih `npm` sebagai default; sebutkan itu ke user, karena proyek Bun/pnpm tanpa lockfile akan mendapat daftar izin `npm`. Agent yang sudah didefinisikan di file md atau di bagian `agent` pada `opencode.json` dilewati. Izin `implementer` (typecheck, lint, test) dan `verifier` (ditambah build, E2E, `check-layout`, `compare-text`, `probe`, `pdftotext`, `pdftoppm`, `compare`) diisi dari `package.json` dan lockfile, jadi manajer paket mengikuti proyek. Blok penolakan rahasia dan git berasal dari satu sumber di skrip supaya tetap sinkron antar agent. Minta user commit hasilnya. Format file subagent OpenCode (frontmatter `description`, `mode: subagent`, `permission`; body = prompt; aturan izin: yang cocok TERAKHIR menang) sudah dicek ke dokumentasi resmi, tetapi periksa ulang bila OpenCode berubah.
 
 Peran:
 
@@ -44,6 +44,8 @@ Subagent tidak pernah commit (izin `git commit*` ditolak di `implementer` dan `v
 | Fitur non-trivial | siklus lengkap di bawah |
 | Fitur dokumen (invoice, kwitansi) | `/reference` untuk spesifikasi; verifikasi dengan `compare-text` |
 | Merapikan struktur | `/layout` (agent utama, bukan paralel) |
+
+Izin per-agent untuk tool MCP tinggal di bagian `agent.*.tools` pada `opencode.json`, bukan di sini; kalau perlu diubah, ubah di sana supaya tidak ada dua daftar.
 | Butuh skill atau alat baru | `/advise` |
 
 ## Siklus fitur
@@ -54,7 +56,7 @@ Di proyek Pawang, siklus ini berjalan di dalam `/feature` (plan), `/implement` (
 3. **Implement**: `implementer`. Paralel hanya bila himpunan file benar-benar terpisah; kalau tidak, berurutan.
 4. **Verify**: `verifier` menjalankan typecheck, test, `check-layout --strict`, E2E untuk alur tulis, `compare-text` untuk dokumen. FAIL kembali ke implementer dengan keluaran verifier sebagai brief. Maksimal 2 putaran, lalu tanya user. Verifier jangan pernah memperbaiki.
 5. **Review**: `reviewer`, hanya untuk perubahan non-trivial atau yang menyentuh database, auth, keputusan, atau dokumen. BLOCKER harus dibereskan dulu; SARAN dilaporkan ke user.
-6. **Handoff dan tutup**: perubahan belum selesai atau akan dilanjutkan: jalankan `/handoff`. Keputusan baru: tulis ke `.pawang/decisions/`. Laporkan ke user: apa yang jadi, bukti verifikasi, temuan tersisa.
+6. **Handoff dan tutup**: perubahan belum selesai atau akan dilanjutkan: jalankan `/handoff`. Keputusan baru yang berlaku seterusnya: minta `/handoff` mempromosikannya ke `.pawang/decisions/`; jangan menulis folder itu sendiri. Laporkan ke user: apa yang jadi, bukti verifikasi, temuan tersisa.
 
 ## Brief ke subagent
 Subagent hanya tahu isi brief. Tulis: tujuan (satu kalimat), file dan docs terkait, yang sudah dikesampingkan atau diketahui, batasan (jangan sentuh apa), format hasil. Contoh singkat:

@@ -33,7 +33,9 @@ config, tokens, and cleanup. Each scope names exactly one of each:
 - `deploy pages`: production deploy of a Pages project with
   `wrangler pages deploy`
 - `preview pages`: per-pull-request Pages preview deployments
-- `deploy <host>` or `preview <host>`: any other host; see `reference/deploy.md`
+- `deploy <host>` or `preview <host>` for the hosts `reference/deploy.md`
+  actually covers. Any other host is out of scope: say so in one line and stop,
+  rather than producing a packet with no execution steps.
 - `e2e workers`: runs the project's documented end-to-end command against a Worker
   Preview, as one more pull-request check. It belongs to the preview scope: it adds
   a job to `preview.yml` or its own `e2e-preview.yml`, and never touches a deploy
@@ -129,11 +131,12 @@ Read `reference/deploy.md`, only the sections for the chosen scopes. Then:
    `reference/ruleset.md`) when the mechanism is a Git integration, because only a
    ruleset can stop a red check from deploying. Write it only if the user says yes.
 
-## Step 4 - prove locally
+## Step 4 - verify locally and prepare
 
 Run only the local proofs listed per scope in `reference/deploy.md`.
 `wrangler preview` and `wrangler pages deploy` have no documented dry run, so
-those scopes are "prepared locally" and the first GitHub run is the real proof.
+those scopes are "prepared locally, not proven" and the first GitHub run is the
+real proof. State which scopes fall on each side of that line in the report.
 Never run a command that deploys, creates a preview, or deletes anything. Do not
 push the workflow. `e2e workers` has no local proof against a Preview: report it as
 "prepared, not proven".
@@ -148,7 +151,9 @@ For each scope:
 - token permission and secret names needed (names only)
 - remote steps left for the user
 - preview isolation status and limitations
-- what was verified against docs and what came from memory, and the smoke test
+- what was verified against docs and what came from memory
+- the smoke test as a remote step for the user to run after the deploy is live;
+  it cannot be a value this skill produces, because Step 4 forbids deploying
 - for `e2e workers`: mechanism, workflow file, the command and base-URL variable
   read from the harness, the check name to require, and the remote steps left
   (URL template variable, Access secrets)

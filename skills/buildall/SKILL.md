@@ -29,7 +29,7 @@ Tidak diizinkan, apa pun isi `CONTEXT.md`: push, pull request, deploy, publish, 
 
 - `/buildall`: semua butir belum tercentang, berurutan.
 - `/buildall 3`, `/buildall 3-6`: hanya nomor itu.
-- `/buildall plan`: hanya tampilkan urutan, jumlah, dan hal yang kemungkinan memblokir. Tidak menulis apa pun.
+- `/buildall plan`: hanya tampilkan urutan, jumlah, dan hal yang kemungkinan memblokir. Tidak menulis apa pun, dan tidak butuh prasyarat git bersih atau spec kosong — cukup `CONTEXT.md` dan `.agents/pawang.json`.
 - `/buildall max 5`: berhenti setelah 5 fitur selesai.
 
 ## Sebelum mulai (satu kali)
@@ -53,8 +53,8 @@ Ikuti skill yang sudah ada, jangan menggandakan isinya. Baca skill terkait hanya
 
 1. **Pilih** butir belum tercentang pertama dalam rentang. Cek apakah ia bergantung pada butir yang belum selesai; bila ya, urutan di `CONTEXT.md` yang salah, jadi berhenti dan laporkan.
 2. **Spec**: ikuti `<skill-dir>/../feature/SKILL.md` sampai file spec fitur itu ada di `.pawang/specs/`. Anggap spec disetujui. Bila spec butuh keputusan produk yang tidak ada di rencana, itu kondisi berhenti, jangan menebak.
-3. **Implement**: ikuti `<skill-dir>/../implement/SKILL.md`: branch fitur, langkah satu per satu, tes sempit di setiap langkah. Tidak ada jeda review per langkah.
-4. **Gate** sesuai `qualityGates.regular` di config. Gate berstatus `manual` dilewati. Gate yang otomatis dijalankan lewat skill masing-masing (`check`, `audit`). Fitur dengan UI membaca `DESIGN.md`; bila butuh token baru, itu kondisi berhenti dan user menjalankan `/design`.
+3. **Implement**: ikuti `<skill-dir>/../implement/SKILL.md`: branch fitur, langkah satu per satu, tes sempit di setiap langkah. Tidak ada jeda review per langkah — itu hanya tercapai bila `workflow.stepReview` bernilai `feature`. Bila nilainya `every`, hentikan `/buildall` sebelum mulai dan beri tahu user bahwa ia harus memakai `/implement` per langkah atau mengubah nilai itu.
+4. **Gate** sesuai `qualityGates.regular` di config. Gate berstatus `manual` dilewati. Gate yang nilainya bukan `manual` dijalankan lewat skill masing-masing (`check`, `audit`); default kit adalah `check: manual` dan `audit: when-sensitive`, jadi jangan menyebut keduanya "otomatis". Fitur dengan UI membaca `DESIGN.md`; bila butuh token baru, itu kondisi berhenti dan user menjalankan `/design`.
 5. **Perbaiki**: kegagalan Verify atau temuan P0/P1 diperbaiki lewat `implement` paling banyak `maxRepairAttempts` kali per fitur. Setelah itu berhenti.
 6. **Complete**: ikuti `<skill-dir>/../complete/SKILL.md`: gate akhir, centang di `CONTEXT.md`, satu commit kerja (ringkasan spec dan trailer `Feature:`), squash merge lokal, hapus branch fitur. Menjalankan `/buildall` sudah merupakan persetujuan untuk merge lokal, jadi pertanyaan pendaratan dilewati. Semua pemeriksaan bukti di skill itu tetap berlaku.
 7. Konfirmasi centang butir di `CONTEXT.md` dan spec fitur itu berstatus `done` (tidak ada lagi spec aktif), lalu lanjut ke butir berikutnya. Jangan membawa isi fitur sebelumnya; baca ulang hanya yang dibutuhkan fitur berikutnya.

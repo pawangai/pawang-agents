@@ -25,11 +25,16 @@ a session handoff (`/handoff`), or a manual check of one feature
 
 ## Rules
 
-- Write exactly one file. Never edit code, tests, config, or `CONTEXT.md`.
+- Write exactly one file, to `.pawang/runbooks/`. When the goal is to measure or
+  compare workflow runs, also append one line to `.pawang/runs/` — that folder is
+  owned by this skill (see the ownership table in `AGENTS.md`). Never edit code,
+  tests, config, or `CONTEXT.md`.
 - Never execute a step from the runbook, not even the safe ones.
 - Every command must already exist. Check the Commands section in `AGENTS.md`
-  and the scripts in `package.json`; if a step has no existing command, write the
-  manual action instead of inventing one.
+  and the scripts in `package.json` when it exists; if a step has no existing
+  command, write the manual action instead of inventing one. The kit's
+  `## Commands` block is a default that projects may replace, so treat a missing
+  section or `package.json` as "ask the user", never as "invent".
 - No secrets, tokens, email addresses, or personal data. Refer to environment
   variable names only.
 - Mark any step that needs approval, a remote service, or a destructive action
@@ -49,8 +54,10 @@ genuinely ambiguous.
 
 ### 2. Collect the real commands
 
-Read the Commands section of `AGENTS.md`, the scripts in `package.json`, and the
-active spec when the runbook covers it. Confirm each command exists before
+Read the Commands section of `AGENTS.md` and the scripts in `package.json`. Read
+an active spec only when the runbook is about that feature; most runbook goals
+(QA pass, incident drill, migration rehearsal) have no active spec, and this
+skill must not require one. Confirm each command exists before
 writing it down.
 
 ### 3. Set the budget and the stops

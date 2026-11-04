@@ -52,9 +52,9 @@ that affect a remote, pause and ask for explicit confirmation first.
 Read:
 
 - `AGENTS.md`
-- `CONTEXT.md` (Features, Data, Stack, Deployment, and Usage model sections, plus the active spec in `.pawang/specs/` when a work item is active; found as described in `.agents/README.md`, Specs)
+- `CONTEXT.md` (`## Features`, `## 3. Data model`, `## 4. Stack`, `## 6. Deployment`, and `## 7. Usage model and constraints` sections, plus the active spec in `.pawang/specs/` when a work item is active; found as described in `.agents/README.md`, Specs)
 - `.pawang/conventions/auth.md` (when present)
-- `package.json` and lockfile, framework config, `.env.example`
+- `package.json` and lockfile, framework config, `env.example` (the kit ships it without a leading dot)
 - existing auth code: `auth.ts`, `auth-client.ts`, middleware, session helpers,
   login routes, any JWT or header validation
 - existing deploy config: `wrangler.jsonc`, `wrangler.toml`, `render.yaml`,
@@ -82,7 +82,7 @@ Pick from evidence, in this order:
 3. auth code or dependencies already in the repo
 4. the app's shape, as a recommendation only
 
-Every question this skill asks the user goes through the `interview` skill: numbered questions, each with a recommended answer, asked in rounds. Any limit on question count stated here still applies, and an interview answer never replaces a separate approval gate.
+Every question this skill asks the user goes through the `interview` skill: numbered questions, each with a recommended answer, asked in rounds. An interview answer never replaces a separate approval gate.
 
 If steps 1-3 disagree or are all empty, ask which provider. Do not default to the
 first row of the table. Never migrate an existing setup to another provider
@@ -105,10 +105,11 @@ Run only local, non-destructive checks that match `AGENTS.md`:
 - typecheck and build, plus tests when configured
 - the provider's schema generation step when Better Auth is chosen (see the
   provider section), then confirm the database migration exists
-- confirm each protected route rejects an anonymous request: 401 for APIs,
-  redirect for pages, and 403 for an authenticated user without permission
-- confirm authorization is checked on the server for every route that touches
-  user data, not only hidden in the UI
+- check every route that already exists: it rejects an anonymous request (401
+  for APIs, redirect for pages, 403 for an authenticated user without
+  permission) and authorization is enforced on the server, not only hidden in
+  the UI. Routes that `/feature` has not built yet cannot be checked here — say
+  so and hand that check to `/check` after implementation.
 - a provider CLI only for local, login-free steps
 
 If a check needs secrets or a remote service, list the env var names needed and

@@ -86,7 +86,7 @@ Panduan membuat skill proyek:
 - Simpan di `.agents/skills/<nama>/` lalu minta user commit. Di proyek Pawang, buat juga command dan daftarkan dengan mengikuti bagian **Proyek Pawang** di skill `pawang-skill-creator`; tanpa itu skill tidak bisa dipanggil. Maksimal satu skill baru per sesi.
 - Fakta statis jangan masuk skill; taruh di `.pawang/`.
 
-**f. Daftarkan.** Edit AGENTS.md langsung: tambah satu baris di AGENTS.md hanya bila skill itu memengaruhi cara kerja (nama skill dan kapan dipakai). Kalau memilih menolak sebuah skill, catat alasannya satu baris di `.pawang/decisions/` agar tidak dicari ulang.
+**f. Daftarkan.** `AGENTS.md` bukan milik skill ini: serahkan pendaftarannya ke `/agents-md` (satu baris di `AGENTS.md`, hanya bila skill itu memengaruhi cara kerja), atau minta user menambahkannya. Kalau memilih menolak sebuah skill, serahkan juga pencatatannya ke `/handoff` yang mempromosikan keputusan ke `.pawang/decisions/`.
 
 ### 5. Jadwalkan tinjau ulang
 Jalankan skill ini lagi bila:

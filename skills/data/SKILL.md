@@ -43,8 +43,8 @@ Optional scope:
   conflicting
 - `drizzle`, `d1`, `r2`, `kv`, `neon`, `supabase`: prepare those targets
 - `<name>`: any other service, for example `/data turso`
-- `check`: read-only data readiness report
-- `config`: focus on creating or updating local schema and config files
+- `check`: read-only data readiness report. Skip Steps 2-3 and produce the report from Step 1 and Step 4 with no writes.
+- `config`: focus on creating or updating local schema and config files. Step 2 covers schema and config only; skip the data-flow wiring in Step 3.
 
 Scopes combine, for example `/data drizzle d1 r2`.
 
@@ -58,9 +58,9 @@ confirmation first.
 Read:
 
 - `AGENTS.md`
-- `CONTEXT.md` (Data, Stack, Deployment, and Usage model sections, plus the active spec in `.pawang/specs/` when a work item is active; found as described in `.agents/README.md`, Specs)
+- `CONTEXT.md` (`## 3. Data model`, `## 4. Stack`, `## 6. Deployment`, and `## 7. Usage model and constraints` sections, plus the active spec in `.pawang/specs/` when a work item is active; found as described in `.agents/README.md`, Specs)
 - `.pawang/conventions/database.md` (when present)
-- `package.json`, lockfile, `.env.example`
+- `package.json`, lockfile, `env.example` (the kit ships it without a leading dot)
 - existing ORM and schema files, `drizzle.config.ts`, migration folders
 - deploy config: `wrangler.jsonc`, `wrangler.toml`, `render.yaml`,
   `vercel.json`, `netlify.toml`
@@ -68,7 +68,7 @@ Read:
 - git branch and working tree status
 
 Never open files that hold secret values (`.env`, `.dev.vars`). Read
-`.env.example` only, and never print connection strings.
+`env.example` only (the kit ships it without a leading dot), and never print connection strings.
 
 Identify:
 
@@ -142,7 +142,7 @@ For every store:
 - eager-load relations to avoid N+1; wrap multi-table writes in a transaction
 - parameterized queries only
 - put non-secret binding names in config and secrets in env; update
-  `.env.example` with names only
+  `env.example` with names only
 - for uploads: sanitize filenames (UUID or slug), validate type by magic bytes and
   enforce a size limit, stream large files, and clean up aborted uploads
 - no new dependency or service without explicit approval (see `AGENTS.md`)

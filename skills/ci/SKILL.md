@@ -33,6 +33,10 @@ separate skill, `/ci-deploy`.
 
 ## Input
 
+Prerequisite: a git checkout with a remote. Step 1 can run without it, but Step 3 (workflow file) and Step 3b (`git config core.hooksPath`) write into a repository and fail outside one. If there is no git repository, stop after Step 2 and tell the user.
+
+Read `.pawang/workflow/verification.md` before Step 2 when it exists: the kit points there for how checks are set up, and this skill should not diverge from it.
+
 No argument is required. A named provider or workflow preference is a request to
 review, not permission to replace existing CI. This skill's default provider is
 GitHub Actions because it creates GitHub pull-request checks.
@@ -79,7 +83,9 @@ normalization before changing that behavior.
 For JavaScript and TypeScript, add or reuse a package script named `verify` and
 invoke it with the detected package manager. For other stacks, use the existing
 native task runner or the smallest clear combined command. Document the exact
-invocation as `Verify` in the Commands section of `AGENTS.md`.
+invocation as `Verify` in the Commands section of `AGENTS.md`. That single
+line is yours (see the ownership table in `AGENTS.md`); do not edit any other
+part of the file — hand other changes to `/agents-md`.
 
 Examples are explanatory only. Never copy them without detecting the project:
 
@@ -134,9 +140,12 @@ is yes:
    the exact `Verify` command from `AGENTS.md` with `exec`, so the command's
    exit code is the hook's exit code.
 2. Point git at the folder: `git config core.hooksPath .githooks`.
-3. For JavaScript and TypeScript projects, add a `prepare` script,
-   `git config core.hooksPath .githooks 2>/dev/null || true`, so a fresh
-   install wires the hook without a manual step. The `|| true` keeps installs
+3. For JavaScript and TypeScript projects, add a `prepare` script whose
+   *only* content is `git config core.hooksPath .githooks 2>/dev/null || true`,
+   so a fresh install wires the hook without a manual step. If the project
+   already has a `prepare` script (Husky and similar), do not replace it:
+   append this command with `&&` so the existing step still runs, and show the
+   user the resulting line before writing. The `|| true` keeps installs
    working where no git checkout exists, such as a deploy build. For other
    stacks, document the `git config` line in the README instead.
 4. Run the hook once (`.githooks/pre-push`). If it fails, remove what this

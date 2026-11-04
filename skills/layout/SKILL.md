@@ -19,8 +19,8 @@ Aturan teks saja mudah dilanggar. Karena itu ada tiga lapis: **aturan** (section
 1. **Letakkan menurut peran.** Satu jenis file, satu tempat.
 2. **Folder adalah namespace.** Nama file tidak mengulang nama folder: `scripts/seed-users.mjs`, bukan `script-seed-users.mjs`.
 3. **kebab-case** untuk file dan folder (`seed-users.mjs`). Pengecualian yang sah: komponen React/Vue/Svelte boleh PascalCase, hook boleh `useXxx`, file khusus alat (`README.md`, `AGENTS.md`, `Dockerfile`, `wrangler.jsonc`) mengikuti alatnya, dan file rute framework (`__root.tsx`, `$id.tsx`, `+page.svelte`). Kalau repo sudah punya gaya dominan yang konsisten, ikuti itu dan catat di AGENTS.md.
-4. **Nama menjelaskan isi.** Skrip memakai pola kata-kerja-objek (`seed-users`, `migrate-db`). Dilarang nama sementara atau duplikat: `final`, `copy`, `backup`, `old`, `new`, `temp`, `draft`, `v2`, `test2`, dan nama generik `utils`, `helpers`, `misc`, `common`.
-5. **Root bersih.** Root hanya berisi konfigurasi, dokumen standar (`AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, `README.md`), dan folder tingkat atas yang terdaftar di `## Repository layout`. Dokumen standar di root tidak dipindah ke folder; `.pawang/rules.md` dan `.pawang/conventions/` memang berada di `.pawang/`. Tidak ada file kode di root.
+4. **Nama menjelaskan isi.** Skrip memakai pola kata-kerja-objek (`seed-users`, `migrate-db`). Dilarang nama sementara atau duplikat: `final`, `copy`, `backup`, `old`, `new`, `temp`, `draft`, `v2`, `test2`, dan nama generik `utils`, `helpers`, `misc`, `common`. `check-layout` melaporkan nama-nama ini sebagai WARN, bukan ERROR; `--strict` yang menjadikannya gagal. Daftar lengkapnya ada di `references/layout-rules.json` (`forbidden_words`) — ubah di sana, bukan di dua tempat.
+5. **Root bersih.** Root hanya berisi konfigurasi, dokumen standar (`AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, `README.md`), dan folder tingkat atas yang terdaftar di `## Repository layout`. `check-layout` juga menerima folder umum yang lazim (`docs`, `public`, `assets`, `migrations`, `drizzle`, `supabase`, `prisma`, `src`, `scripts`, `tests`, `e2e`) lewat `root_allowed_dirs.common` di `references/layout-rules.json`; daftarkan yang benar-benar dipakai proyek ke section itu, atau hapus dari `common`. Dokumen standar di root tidak dipindah ke folder; `.pawang/rules.md` dan `.pawang/conventions/` memang berada di `.pawang/`. Tidak ada file kode di root.
 6. **Jangan spekulatif.** Folder baru dibuat saat file pertamanya ada. Jangan memecah jadi package sebelum ada konsumen kedua.
 7. **`shared` bukan tempat sampah.** Isinya harus bertema (`ui/`, `design-system/`, `lib/`). Kode yang hanya dipakai satu app tetap di app itu. Naik ke `shared` saat dipakai dua app.
 
@@ -56,7 +56,7 @@ Arah dependensi (tegakkan dengan alat kalau ada): `apps` boleh memakai `packages
 ## Mode
 
 ### 1. Define: menulis aturan
-1. Ambil profil dari AGENTS.md dan `CONTEXT.md` (monorepo atau bukan, jumlah deployable, stack). Kalau belum ada, tanya user.
+1. Ambil profil dari AGENTS.md dan `CONTEXT.md` (monorepo atau bukan, jumlah deployable, stack). Kalau belum ada, tanya user lewat skill `interview`.
 2. Pilih preset. Tanyakan hanya kalau ambigu (satu pertanyaan).
 3. Tulis section berikut ke AGENTS.md. Hanya folder yang sudah ada atau segera dibuat. Maksimal sekitar 15 baris:
 
@@ -73,8 +73,8 @@ Preset: <aplikasi tunggal | monorepo>.
 | `packages/shared/design-system/` | token, tema, primitif | |
 | `scripts/` | skrip satu tujuan | `scripts/<kata-kerja-objek>.mjs` |
 
-Penamaan: kebab-case. Folder adalah namespace (jangan ulangi nama folder di nama file). Dilarang: final, copy, backup, old, new, temp, v2, utils, helpers, misc.
-Sebelum membuat file baru: tentukan lokasinya dari tabel ini. Kalau tidak ada yang cocok, tanya user. Jangan membuat folder baru di root.
+Penamaan: kebab-case. Folder adalah namespace (jangan ulangi nama folder di nama file). Kata terlarang: lihat `forbidden_words` di `references/layout-rules.json`; `check-layout` memberi WARN dan `--strict` menggagalkannya.
+Sebelum membuat file baru: tentukan lokasinya dari tabel ini. Kalau tidak ada yang cocok, tanya user lewat skill `interview`. Jangan membuat folder baru di root.
 ```
 
 Folder tingkat atas yang tertulis dalam backtick di section ini otomatis dianggap sah oleh skrip audit.

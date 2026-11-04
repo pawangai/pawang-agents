@@ -46,6 +46,22 @@ Perbaikan dari review Goldfish (`egm-review`, Stage 5-8). Belum dirilis.
 - Peta "Isi repo" di `README.md` dilengkapi: `skills/agents/`, `scripts/lib.mjs`, `scripts/release-notes.mjs`.
 - Asal-usul diperjelas: sejak 0.1.29 repo ini adalah hulu. Arsip `pawang-v0_1_30.zip` adalah titik awal, bukan sumber yang dilacak; tidak ada upstream yang di-diff dan tidak ada sinkronisasi otomatis.
 
+### Isi prosedur (review 32 skill)
+
+Review isi menjalankan satu reviewer berkonteks baru per skill terhadap `kit/AGENTS.md` dan `.pawang/rules.md`, menghasilkan 98 temuan. Laporan: `procedure-review.md`.
+
+- Lima skill melanggar aturan kepemilikan berkas kit sendiri (`advise`, `agents`, `handoff`, `reference`, `ci`). Empat di antaranya kini menyerahkan ke `/agents-md` atau `/handoff`; kit menambahkan kepemilikan baris `Verify` untuk `ci` dan folder `.pawang/specs/documents/` untuk `reference`.
+- Nilai gate disamakan dengan skema: `verification.logicTests`/`uiEvidence` memakai `always`/`when-configured`, bukan `required` yang tidak dikenal kode mana pun. `complete` dan `implement` memakai nilai yang benar.
+- `/status` melaporkan default audit `when-sensitive` (sebelumnya `manual`), menyertakan `independentReview`, dan memakai default branch yang dideteksi.
+- `status/scripts/permissions.mjs` tidak lagi berhenti saat `.agents/pawang.json` hilang atau JSON-nya rusak; keduanya dilaporkan sebagai catatan.
+- Istilah yang tidak ada di kit dihapus: `activity`/`ready` di `feature` dan `implement`, "repo manifest" di `context`, "dispatcher" di `check`.
+- Dua URL OpenCode yang 404 diganti dengan `/docs/permissions/` dan `/docs/plugins/`; `bunx auth@latest` diganti `bunx @better-auth/cli@latest`.
+- Prasyarat yang sebelumnya diam ditulis eksplisit: repo git di `ci`, `CONTEXT.md` di `design`, kit di `adopt`, Node dan lockfile di `agents`, `AGENTS.md` di `implement`.
+- Langkah yang menuntut bukti yang belum bisa ada diperbaiki: `/auth` hanya memeriksa rute yang sudah ada, `ci-deploy` menyebut smoke test sebagai langkah remote, `deps` punya fallback saat `Verify` belum ada.
+- Nama seksi `CONTEXT.md` di `auth`, `data`, dan tabel pemetaan `plan` disamakan dengan template kit. `env.example` diseragamkan (kit mengirim nama tanpa titik), termasuk negasi di `.gitignore` kit dan pola izin di `opencode.json`.
+- Pertanyaan ke user dirutekan lewat `interview` di `debug` dan `layout`; klausa "question count" yang menggantung di `auth` dan `tests` dihapus.
+- `rollback` mengecualikan seluruh `.pawang/**` dan `openapi.json`; `incident` mengizinkan Cause/Route diperbarui setelah `/debug`; `runbook` memakai `.pawang/runs/` untuk pengukuran; `layout` memakai satu daftar kata terlarang dari `layout-rules.json`.
+
 ## [0.1.29] - 2026-11-04
 
 Rilis pertama pawang-agents: workflow Pawang v0.1.29 dikemas ulang sebagai Agent Skills.

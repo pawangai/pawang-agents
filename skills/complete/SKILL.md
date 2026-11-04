@@ -91,10 +91,11 @@ Before logging or committing, run a short safety pass and report blockers only:
   declared test command and the change touched logic
 - any check required by `qualityGates.regular` has evidence, and testable work
   has a clear manual try path while non-testable work has a recorded skip reason
-- with `verification.logicTests: "required"`, logic changes have a configured
-  runner and passing focused tests; otherwise completion is blocked and `/tests`
-  is the next setup step
-- with `verification.uiEvidence: "required"`, UI done-whens have direct browser
+- with `verification.logicTests: always` (the kit default; the other accepted
+  value is `when-configured`), logic changes have a configured runner and
+  passing focused tests; otherwise completion is blocked and `/tests` is the
+  next setup step
+- with `verification.uiEvidence: always`, UI done-whens have direct browser
   evidence, including screenshots and relevant console and network checks
 - UI work that changed tokens or visual rules has a matching, linted `DESIGN.md`
   (`/design`); this skill never edits `DESIGN.md` itself

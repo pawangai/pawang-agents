@@ -42,8 +42,8 @@ Diperbarui: <tanggal-jam> | Branch/commit: <nama / hash>
 - <hal yang belum jelas>
 ```
 
-5. Promosikan keputusan permanen. Untuk setiap item di "Keputusan baru" yang berlaku seterusnya, buat/tambahkan ke `.pawang/decisions/NNNN-judul.md` (Status: Accepted) atau ke AGENTS.md kalau itu larangan keras. Jangan biarkan keputusan permanen hanya ada di handoff, karena file ini akan ditimpa.
-6. Pastikan AGENTS.md punya baris peta dokumen untuk `.pawang/handoff/<topik>.md`. Kalau belum, tambahkan.
+5. Promosikan keputusan permanen. Untuk setiap item di "Keputusan baru" yang berlaku seterusnya, buat/tambahkan ke `.pawang/decisions/NNNN-judul.md` (Status: Accepted) — folder itu milik `handoff`. Larangan keras yang harus masuk `AGENTS.md` diserahkan ke `/agents-md`, bukan ditulis sendiri. Jangan biarkan keputusan permanen hanya ada di handoff, karena file ini akan ditimpa.
+6. Pastikan `AGENTS.md` punya baris peta dokumen untuk `.pawang/handoff/<topik>.md`. Kalau belum ada, jalankan `/agents-md` dan minta baris itu ditambahkan; `AGENTS.md` bukan milik skill ini.
 7. Di pesan penutup ke user, berikan prompt hemat dalam blok kode yang bisa langsung disalin:
 
 ```
@@ -64,7 +64,7 @@ Jangan memindai seluruh repo.
 
 ## C. Setelah topik selesai total
 
-Hapus file handoff-nya, atau pindahkan ke `.pawang/handoff/_archive/`. Pastikan keputusan permanen sudah dipromosikan (langkah A.5).
+Hapus file handoff-nya, atau pindahkan ke `.pawang/handoff/_archive/` — subfolder di dalam folder yang skill ini miliki, jadi tidak butuh baris pemilik baru. Pastikan keputusan permanen sudah dipromosikan (langkah A.5).
 
 ## Kesalahan umum
 

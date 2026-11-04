@@ -41,10 +41,11 @@ state.
    `Watch:` line with the drift and point to `.pawang/workflow/config.md`. A
    missing file is healthy and means defaults. Invalid JSON, schema versions,
    keys, values, non-file paths, or symbolic links are a warning; tell the user to fix the file before any mutating workflow
-   command. Report the effective audit, check, and try-guide policies, plus the `git.commit`,
-   `git.merge`, `git.push`, and `git.branchCleanup` values (each defaults to `ask`;
-   `branchCleanup` also accepts `keep`). Audit and
-   check default to `manual`; try guide defaults to `when-testable`.
+   command. Report the effective audit, check, try-guide, and independent-review
+   policies, plus the `git.commit`, `git.merge`, `git.push`, and
+   `git.branchCleanup` values (each defaults to `ask`; `branchCleanup` also
+   accepts `keep`). Audit and independent review default to `when-sensitive`,
+   check defaults to `manual`, and try guide defaults to `when-testable`.
 2. **Standard files** - presence and state of `CONTEXT.md`, `DESIGN.md`,
    and `.pawang/conventions/`. `CONTEXT.md` missing or still holding the
    template placeholders (`Feature one`, `description`, unchanged guidance text)
@@ -73,7 +74,7 @@ state.
    changes, roughly how many files changed, last commit subject, and whether the
    branch is ahead of its remote. If the directory is not a git repo, say so and
    skip this part rather than failing.
-7. **Progress drift** - flag active spec on `main`, a spec in progress but no
+7. **Progress drift** - resolve the default branch as in item 6 (`git symbolic-ref refs/remotes/origin/HEAD`, or the branch the remote tracks) instead of assuming `main`, then flag an active spec on that branch, a spec in progress but no
    branch matching the configured feature, fix, or rollback prefix, all spec steps checked but
    not completed, a checked feature in `## Features` that has no
    `Feature:` trailer commit in `git log` (unless it was already checked in the first commit that added `CONTEXT.md`: it shipped before Pawang), a not-done spec for a feature that is already checked, or

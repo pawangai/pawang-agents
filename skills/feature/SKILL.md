@@ -53,9 +53,11 @@ Gather the smallest packet that can answer what must be built:
 4. Run the declared Verify command once when it exists. Record only observed
    results. Do not start a dev server.
 
-Finish context gathering in at most four tool rounds after this skill starts:
-target and `CONTEXT.md` matches, one batched repository inspection, applicable
-standards only if needed, and Verify. Combine or skip rounds when possible. Do
+Finish context gathering in at most four tool rounds after this skill starts.
+Count every tool call, including the reads in the section above; rounds are
+grouped as target and `CONTEXT.md` matches, one batched repository inspection,
+applicable standards only if needed, and Verify. One call that reads several
+files is one round. Combine or skip rounds when possible. Do
 not inspect other skill directories, the findings ledger, or templates beyond
 the ones this skill names during normal planned-feature work. Do not create
 scratch code or run implementation probes while writing a spec. Put a check in the
@@ -217,6 +219,6 @@ If a prerequisite is absent, incomplete, untracked, or unverified, say which one
 the evidence shows. Do not bury repair inside this feature. Stop with the exact
 `/fix` or user decision required.
 
-Otherwise write the tightened spec, update activity to `ready`, and stop for
-review. Lead with a short note naming what the critique changed, or say that it
+Otherwise write the tightened spec, set `**Status:** not started` on it (the only
+pre-build value the kit defines), and stop for review. Lead with a short note naming what the critique changed, or say that it
 found no material change. Never implement from this skill.

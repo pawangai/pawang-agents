@@ -25,7 +25,8 @@ independent mode, the `## Review` block of that file.
 
 The quality-gate config controls when another workflow invokes this skill
 automatically. An explicit `/audit` or `$audit` request always selects the audit
-regardless of whether the applicable gate is `manual`, conditional, or `always`.
+regardless of whether the applicable gate is `manual` or a conditional value
+(`when-sensitive`, `when-behavioral`, `when-testable`) or `always`.
 A missing config means built-in defaults. If it exists but is invalid, stop and
 ask the user to fix `.agents/pawang.json` before writing the findings ledger.
 
@@ -77,6 +78,7 @@ If the lens is unclear, use all lenses and state that choice.
 Resolve this required context:
 
 - `AGENTS.md`
+- `.pawang/rules.md` (the kit requires it before reviewing code)
 - `.agents/pawang.json`
 - `CONTEXT.md`: the relevant sections, and the active spec file in `.pawang/specs/`
 - `.pawang/conventions/`
@@ -302,8 +304,7 @@ Run it after the implementation steps are done and `Verify` and any required
 the findings ledger (Step 4) and the `## Review` block below.
 
 1. **Fix the target.** Compute the reviewed tree hash. Set `BRANCH` to the default
-   branch (for example `main`); the angle brackets below are a placeholder, not a
-   literal. The hash covers committed branch work, uncommitted edits, and untracked
+   branch (for example `main`) before running the block. The hash covers committed branch work, uncommitted edits, and untracked
    files, but not session-scoped workflow state, so ledger and handoff edits do not
    make a review stale. Excluded: `CONTEXT.md`, `.pawang/specs/`, `.pawang/handoff/`,
    `.pawang/runbooks/`, `.pawang/assessments/`. `.pawang/decisions/` and
@@ -314,7 +315,7 @@ the findings ledger (Step 4) and the `## Review` block below.
        WF=":(exclude)CONTEXT.md :(exclude).pawang/specs :(exclude).pawang/handoff :(exclude).pawang/runbooks :(exclude).pawang/assessments"
        (git diff "$BRANCH" -- . $WF; \
         git ls-files -o --exclude-standard -z \
-        | grep -zv -e '^\.pawang/specs/' -e '^\.pawang/handoff/' \
+        | grep -zv -e '^CONTEXT\.md$' -e '^\.pawang/specs/' -e '^\.pawang/handoff/' \
                   -e '^\.pawang/runbooks/' -e '^\.pawang/assessments/' \
         | xargs -0 -r git hash-object --) | git hash-object --stdin
 

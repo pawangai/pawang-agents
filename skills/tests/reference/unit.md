@@ -48,7 +48,7 @@ Do not assume Next.js. Detect the stack from files.
 Prefer the existing runner if one is already present. If none exists, choose the
 stack-native unit test runner:
 
-- Bun project (`bun.lock` or `bun.lockb`, or Bun declared in `AGENTS.md`): the
+- Bun project (`bun.lock` in current Bun; `bun.lockb` is the older binary lockfile, or Bun declared in `AGENTS.md`): the
   built-in `bun test` by default. It adds no dependency. Choose Vitest instead
   (with the Cloudflare Workers pool when tests need real D1, KV, or R2 bindings)
   only when the project already uses it or needs those bindings, and say why.
@@ -77,8 +77,9 @@ Apply the smallest practical diff:
    exists; otherwise add a tiny helper and test that proves the runner works.
 4. Update the Commands section of `AGENTS.md` with the real test command and,
    when available, the test watch command.
-5. If a `Verify` command already exists, add the real test command to it between
-   typecheck and build while preserving any established project checks. Do not
+5. If a `Verify` command already exists, add the real test command to it where
+   it belongs in the order of checks the project already has — do not assume that
+   order is typecheck then build, and do not reorder existing checks. Do not
    create verification or CI only because `/tests` was invoked.
 6. Update `.pawang/conventions/testing.md` only if the project needs a
    stack-specific testing note different from the default.

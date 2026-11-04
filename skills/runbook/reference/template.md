@@ -20,7 +20,7 @@ One sentence: what is true when this runbook is done.
 For each step: the command, the expected result, and what to do when the result
 differs. Number them. Keep one action per step.
 
-1. **<Action>**
+1. **<Action>** [needs approval]
 
    ```sh
    <exact command>
@@ -29,6 +29,10 @@ differs. Number them. Keep one action per step.
    Expected: <status code, string, file, or count>
 
    If different: <stop, retry, or branch>
+
+   Drop the `[needs approval]` marker on steps that need no approval; keep it
+   exactly where a human must sign off, hit a remote service, or do something
+   destructive.
 
 ## Stop conditions
 

@@ -21,8 +21,23 @@ const readJson = (p) => JSON.parse(read(p));
 const problems = [];
 const notes = [];
 
-const pawang = readJson(".agents/pawang.json");
-const opencode = existsSync(join(root, "opencode.json")) ? readJson("opencode.json") : {};
+// Berkas hilang berarti sehat dan memakai default; JSON rusak berarti peringatan.
+// Keduanya tidak boleh membuat skrip ini berhenti, karena /status justru dipakai saat ada yang tidak beres.
+function load(file) {
+  if (!existsSync(join(root, file))) {
+    if (file === ".agents/pawang.json") notes.push(`${file} is missing; using built-in defaults`);
+    return null;
+  }
+  try {
+    return readJson(file);
+  } catch (err) {
+    problems.push(`${file} is not valid JSON (${err.message.split("\n")[0]}); tell the user to fix it`);
+    return null;
+  }
+}
+
+const pawang = load(".agents/pawang.json") ?? {};
+const opencode = load("opencode.json") ?? {};
 const perms = pawang.permissions ?? {};
 const git = pawang.git ?? {};
 const client = opencode.permission ?? {};

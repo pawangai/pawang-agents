@@ -80,7 +80,7 @@ Gabungkan dalam satu giliran, hanya yang benar-benar perlu:
 - Pengaturan P: dari mana datangnya (tabel pengaturan, config).
 
 ### 7. Tulis spesifikasi
-Gunakan `references/spec-template.md`. Simpan ke `.pawang/specs/documents/<jenis>.md` (satu file per jenis dokumen), dan daftarkan di peta dokumen AGENTS.md dengan mengedit AGENTS.md. Lampirkan juga, di folder `.pawang/specs/documents/<jenis>/`:
+Gunakan `references/spec-template.md`. Simpan ke `.pawang/specs/documents/<jenis>.md` (satu file per jenis dokumen). Folder itu milik `reference` menurut tabel kepemilikan kit. Untuk mendaftarkannya di peta dokumen, jalankan `/agents-md` dan minta baris itu ditambahkan; jangan mengedit `AGENTS.md` sendiri. Lampirkan juga, di folder `.pawang/specs/documents/<jenis>/`:
 - `reference.anon.txt`: teks referensi **teranonimkan**, sebagai bahan uji.
 - `reference.anon.png` bila perlu, **hanya setelah** data pribadinya ditutup.
 - logo milik organisasi (bila dipakai).
@@ -111,7 +111,7 @@ Hasil `--words` ada tiga:
 
 Mode baris menguji L2 dan akan menandai selisih saat sel tabel terbungkus berbeda. Itu temuan tata letak yang sah (lebar kolom atau font berbeda), bukan kesalahan konten.
 
-**c. Bandingkan gambar (L2/L3):**
+**c. Bandingkan gambar (L2/L3).** Tahap ini butuh `pdftoppm` dan `identify` (ImageMagick). Cek ketersediaannya dulu seperti langkah 2; bila tidak ada, laporkan L2/L3 sebagai tidak dijalankan, jangan diam-diam menurunkannya menjadi L1:
 ```
 pdftoppm -r 100 -png -singlefile referensi.pdf ref
 pdftoppm -r 100 -png -singlefile hasil.pdf gen

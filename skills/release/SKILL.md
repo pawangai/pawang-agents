@@ -41,8 +41,8 @@ Optional scope:
 - `cloudflare`, `render`, `vercel`, `netlify`: prepare readiness and config for
   that provider
 - `<name>`: any other host, for example `/release flyio`
-- `check`: read-only deployment readiness report
-- `config`: focus on creating or updating local provider config files
+- `check`: read-only deployment readiness report. Skip Step 4 entirely.
+- `config`: focus on creating or updating local provider config files; Step 4 is the only step that changes behavior for this scope.
 
 Scopes combine, for example `/release cloudflare config`.
 
@@ -122,7 +122,7 @@ command needs secrets, list the env var names needed and skip that check.
 ## Step 4 - prepare local config
 
 Only create or update local config files when the target is clear or the user
-asked for config.
+asked for config, and never for the `check` scope.
 
 Provider config formats, recommended products, and CLI commands change over
 time. When web search or provider docs are available, confirm file names, field

@@ -20,7 +20,7 @@ disable-model-invocation: true
   preference to clarify, not permission to install browser automation.
 - If the user requests both modes, ask which to set up first. Complete one setup
   at a time. If the requested mode is unclear, clarify before editing.
-- Every question this skill asks the user goes through the `interview` skill: numbered questions, each with a recommended answer, asked in rounds. Any limit on question count stated here still applies, and an interview answer never replaces a separate approval gate.
+- Every question this skill asks the user goes through the `interview` skill: numbered questions, each with a recommended answer, asked in rounds. An interview answer never replaces a separate approval gate.
 
 Load only the selected reference. Do not read both references preemptively.
 Treat any remaining runner or stack arguments as preferences to verify against

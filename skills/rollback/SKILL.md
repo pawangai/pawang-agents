@@ -48,21 +48,21 @@ Do not stash, discard, fetch, pull, switch branches, or clean the tree from this
 
 `/complete` lands each work item as one squashed commit whose body ends with a trailer (`Feature: 12`, or `Rolled-back: 12` for an earlier reversal) and that flips the feature's checkbox in `CONTEXT.md`. That makes the commit provable from `git log`, without any archive or extra file.
 
-1. List the build commits on the default branch, newest first: `git log --first-parent --format=%H --grep='^Feature: 12$'`. The anchored pattern keeps `12` from matching `12a` or `120`. List earlier reversals the same way with `--grep='^Rolled-back: 12$'`.
+1. List the build commits on the default branch, newest first, using the full id as written in `CONTEXT.md` and in the trailer: `git log --first-parent --format=%H --grep='^Feature: 12$'`. The anchored pattern keeps `12` from matching `12a` or `120`; when the id has a letter suffix, build the pattern from that full id (`12a`), not from the number alone. List earlier reversals the same way with `--grep='^Rolled-back: 12$'`.
 2. Drop every build commit that has a reversal commit descending from it (`git merge-base --is-ancestor <build> <reversal>`). Exactly one unreversed build commit must remain. A feature rolled back and then rebuilt resolves to the rebuild.
 3. Confirm the commit changes the feature's checkbox in `CONTEXT.md` (`git show <commit> -- CONTEXT.md`). Read its `Spec:` trailer to locate the feature's spec file (fallback: `.pawang/specs/<id>-*.md`) and record that path as the target spec. Record the commit and its parent as full 40-character SHAs. `git rev-list --parents -n1 <commit>` must list exactly one parent.
 4. If no trailer commit exists (an older project, or a squash merge that dropped the body), ask the user for the commit SHA and apply step 3 to it. Never guess from subject lines.
 
 Stop and show the evidence (lines and commits found) when the result is zero, more than one, a commit not on the default branch's first-parent line, or a merge commit with two parents. For a merge commit, do not guess a mainline: explain that the pre-feature state cannot be inferred safely and tell the user what to decide. Never pick by newest commit or message text alone.
 
-Confirm the commit's diff is consistent with the requested feature before continuing.
+Confirm the commit's diff is consistent with the requested feature before continuing: stop if it touches areas the feature's spec does not mention, if it is far larger or smaller than the spec's steps imply, or if unrelated files moved in the same commit.
 
 ## Step 2 - separate product changes from workflow files
 
 Inspect the target commit and build the product-path set from the files it changed. Exclude these workflow paths; the rollback never reverses them automatically:
 
 - `.agents/**`, `.opencode/**`, `opencode.json`
-- `AGENTS.md`, `CONTEXT.md`, `.pawang/rules.md`, `.pawang/specs/**` (the reverse patch never touches them; `/complete` deletes the target spec afterwards)
+- `AGENTS.md`, `CONTEXT.md`, `.pawang/**` (rules, specs, decisions, incidents, handoffs, assessments, runbooks, workflow files), `openapi.json` — all owned by other skills per the ownership table. The reverse patch never touches them; `/complete` deletes the target spec afterwards. `.pawang/conventions/` is the exception: list those files under "Review separately" rather than reversing them silently.
 
 `DESIGN.md` and `.pawang/conventions/` are owned by other skills. If the target commit changed them, list each hunk under "Review separately" in the spec: tokens or rules that only the removed feature used are handed to `/design` or the user after the code is reversed. Do not include them in the reverse patch.
 

@@ -12,7 +12,7 @@
 
 **Context reuse:** Reuse any required file already loaded in project instructions or the current session. Read it again only if absent, changed, or exact current bytes or line references are needed.
 
-Verification activity was started by the dispatcher before loading this reference.
+The `/check` command loaded this reference; there is no separate dispatcher.
 
 Where this sits in the workflow:
 
@@ -103,13 +103,13 @@ Give a short, honest verdict, one line per checklist item:
 
 Then state the bottom line: are all the feature's done-whens proven, or not yet.
 
-- All proven -> update only the `**Status:**` line in
-  active spec in `CONTEXT.md` to `verified`, then say it is ready for
-  `/complete`.
-- Anything failed -> update only that status line to `verification failed`, then
-  hand back to `/implement`; name what to fix. Do not fix it here.
-- Anything unverifiable -> update only that status line to `verification
-  incomplete`, then say why; never report it as a pass.
+- All proven -> update only the `**Status:**` line of the active spec file in
+  `.pawang/specs/` to `verified`, then say it is ready for `/complete`.
+- Anything failed -> set that status line to `in progress` and hand back to
+  `/implement`; name what to fix. Do not fix it here and do not invent a status
+  the kit does not define.
+- Anything unverifiable -> leave the status at `in progress`, then say why;
+  never report it as a pass and never mark it `verified`.
 
 The status-line update is generated workflow state, not a product-source edit.
 Do not change the spec, checkboxes, findings, or product files from `/check`.

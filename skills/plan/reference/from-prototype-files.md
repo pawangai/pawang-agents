@@ -59,17 +59,20 @@ Confirm proposals with the `interview` skill: each open decision becomes a numbe
 
 ## Mapping to CONTEXT.md sections 1-8
 
+Heading names and order below follow `kit/CONTEXT.md`. Do not rename them; `/sync` checks them against the template.
+
 | Section | Fill from |
 | --- | --- |
 | 1. Problem | PRD summary and current-state problem (with its code evidence), success metrics (now to target) |
 | 2. Users | PRD roles. Only roles seen in code; keep the "not a final list" note |
-| 3. Features | PRD FR-n grouped by priority, goals and explicit non-goals (exclusions matter, keep them), sitemap and funnel when present, flow behavior (status enums and transitions, flow IDs), edge cases that change what a feature must do (Sev K and T first), resolved conflicts |
-| 4. Data | Entities and ownership from the module map, content model, and lifecycles; single-source-of-truth decisions for duplicated data |
-| 5. Tech | Target architecture, module rules, manifest contract, route namespaces and redirect table, risks and trade-offs |
-| 6. Monetize | Not covered by prototype. Ask or leave `TBD` |
-| 7. UI/UX | Shell spec (rail, second panel, layout modes, widths), responsive and accessibility rules from `03` |
-| 8. Deployment | Migration strategy phases and "done when" criteria, NFRs about rollout |
-| 9. Usage model and constraints | Only confirmed facts: **Wajib** policies, NFRs the user confirmed (security, compliance, scale). Never an unconfirmed assumption |
+| 3. Data model | Entities and ownership from the module map, content model, and lifecycles; single-source-of-truth decisions for duplicated data |
+| 4. Stack | Target architecture, module rules, manifest contract, route namespaces and redirect table, risks and trade-offs |
+| 5. UI/UX | Shell spec (rail, second panel, layout modes, widths), responsive and accessibility rules from `03` |
+| 6. Deployment | Migration strategy phases and "done when" criteria, NFRs about rollout |
+| 7. Usage model and constraints (optional) | Only confirmed facts: **Wajib** policies, NFRs the user confirmed (security, compliance, scale). Never an unconfirmed assumption |
+| 8. Monetization (optional) | Not covered by prototype. Ask or leave `TBD` |
+
+The features themselves go under `## Features`, not in sections 1-8 — see the next mapping.
 
 Do not paste the Mermaid diagrams or the frame inventory into the plan. Summarize in text with exact enum names and point to the file (for example "see `02-user-flows.md`, F3"). The detailed files stay the source for later `/feature` specs, so record in CONTEXT.md section 7 where they live (their path in the repo). If they were only attached to the chat and are not in the project, tell the user to add them to it (recommend `prototype/` at the repo root); until then the trace IDs on Features lines point nowhere.
 
@@ -78,7 +81,7 @@ Do not paste the Mermaid diagrams or the frame inventory into the plan. Summariz
 1. Take FR-n as the candidate features. Cut each to a feature-sized outcome; merge tiny FRs that ship together and keep large ones whole (splitting happens later at `/feature`).
 2. Order by: P0 before P1 before P2, then dependencies (the shell and auth before modules that live inside them), then the migration strategy's phase order, then the "Kerjakan dulu (blocker desain)" list from `04`.
 3. A consolidation project makes each module's migration into the shell a feature-sized item. Shared pieces the modules depend on (shell, single auth and account, shared primitives) are items too when users see them; pure scaffolding is not.
-4. P1 and P2 work goes under a `## Post-MVP` heading when the user's MVP cut says so.
+4. P1 and P2 work goes under a `### Post-MVP` heading when the user's MVP cut says so; `## Features` stays the only H2, and milestone headings stay H3.
 5. Add traceability at the end of the line so `/feature` can find the detail:
    `- [ ] 3. **Booking lifecycle** - request, approve, process refunds (FR-4, flow F3, EC-BK-01..04)`
 6. Finish with the deployment readiness item.

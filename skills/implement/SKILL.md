@@ -19,7 +19,7 @@ In one preflight batch, read:
 - `.agents/pawang.json`
 - the active spec file in `.pawang/specs/` (read that file only)
 - the current branch, status, and recent relevant log
-- the Commands section already loaded from `AGENTS.md`
+- the Commands section of `AGENTS.md`; read the file if it is not already loaded, and stop if it has no Commands section
 
 Stop on invalid config. Stop for `/feature`, `/fix`, or `/rollback` when there is no active spec.
 When the spec says `**Type:** Rollback`, read
@@ -79,10 +79,11 @@ For each step:
 5. Check the step box only after its code and focused check pass. Mark a repaired
    finding `fixed`, never `closed`.
 
-With `verification.logicTests: required`, any logic-bearing step stops and
-points to `/tests` when no test runner is configured. Its focused logic tests
-must pass before the step can be checked. With `verification.uiEvidence:
-required`, a UI done-when cannot pass on build output alone. Capture the
+With `verification.logicTests: always` (the kit default; `when-configured` is
+the other accepted value), any logic-bearing step stops and points to `/tests`
+when no test runner is configured. Its focused logic tests must pass before the
+step can be checked. With `verification.uiEvidence: always`, a UI done-when
+cannot pass on build output alone. Capture the
 configured browser evidence, or stop and ask the user to start the required
 server when live evidence cannot run automatically.
 
@@ -155,7 +156,8 @@ spec checklist step, mark it fixed after its check passes, then send it back to
 
 When all steps and required gates pass:
 
-- Update activity to `ready` with `/complete` as the resume command.
+- Leave the spec `**Status:** in progress` and tell the user `/complete` is the
+  resume command; the kit defines no `ready` state.
 - Present the branch, changes grouped by area, exact checks run, finding
   state, known risks, configured gate outcomes, and
   `/complete` as the next action.

@@ -9,7 +9,7 @@
       "*.env.*": "deny",
       "*.dev.vars": "deny",
       "*.dev.vars.*": "deny",
-      "*.env.example": "allow",
+      "*env.example": "allow",
       "*.dev.vars.example": "allow"
     },
     "edit": {

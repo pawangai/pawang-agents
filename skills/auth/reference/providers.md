@@ -29,7 +29,7 @@ email/password, or social login, stored in the project's database.
 - Set `baseURL` and trusted origins from env so production and preview origins
   are explicit, not wildcards.
 
-**Schema.** Run `bunx auth@latest generate`. With Drizzle it writes a schema file
+**Schema.** Run `bunx @better-auth/cli@latest generate`. With Drizzle it writes a schema file
 that Drizzle owns from then on; `bunx auth@latest migrate` is for the built-in
 Kysely adapter only. Then create a Drizzle migration (see `/data`). Regenerate
 after adding or removing plugins. Do not hand-edit generated auth tables. Check

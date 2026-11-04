@@ -3,5 +3,5 @@ node_modules/
 .env.*
 .dev.vars
 .dev.vars.*
-!.env.example
+!env.example
 .agents/runlog/

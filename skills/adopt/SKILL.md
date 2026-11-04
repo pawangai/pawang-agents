@@ -36,10 +36,12 @@ package is evidence as well; when the user wants a plan from it, point to
 
 ## Step 0 - confirm it's brownfield and safe
 
-Look at `CONTEXT.md`, `DESIGN.md`, and `.pawang/conventions/`.
+Prerequisite: the Pawang kit is already overlaid in the project (run `/pawang-init` first). This skill fills `CONTEXT.md`, `DESIGN.md`, `.pawang/conventions/`, and `AGENTS.md` from the codebase; it does not install them.
+
+Look at `AGENTS.md`, `CONTEXT.md`, `DESIGN.md`, and `.pawang/conventions/`.
 
 - If they are missing or still the shipped template placeholders, proceed.
-- If a file already holds real content, that file is already adopted. Stop for it and offer to refresh specific sections instead of overwriting work the user owns. Other files that are still placeholders may proceed.
+- If a file already holds real content, that file is already adopted. Stop for it and offer to refresh specific sections instead of overwriting work the user owns. Other files that are still placeholders may proceed. `AGENTS.md` counts too: if it carries project-specific rules beyond the shipped kit, hand its update to `/agents-md` instead of rewriting it here.
 
 Never overwrite filled-in content without explicit confirmation. Never run a framework scaffolder (Pawang is an overlay, never a generator).
 
@@ -140,7 +142,7 @@ Stop and show the user what you created, calling out:
 - verification command and GitHub checks status,
 - the Pawang visibility choice, and a tracked-file warning if local-only mode was chosen after files were already tracked.
 
-These files are ones the user *owns*. Have them review and adjust, then tell them to run `/context` to validate the checklist and offer the baseline commit, and then start the normal loop with `/feature`.
+These files are ones the user *owns*. Have them review and adjust, then tell them to run `/context` to validate the checklist, and then start the normal loop with `/feature`. Do not promise a baseline commit here: `/context` offers it only for a project with no checked feature and no active spec, and an adopted codebase normally fails both conditions. If the user wants one, that is `/context`'s call to make and explain.
 
 ## Rules
 

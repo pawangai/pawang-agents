@@ -14,7 +14,7 @@ Dokumen ini memetakan **mekanisme** tiap jalur. Perintah yang bisa disalin ada d
 | OpenCode, dan agent lain yang membaca `.agents/skills` | salinan persis `skills/` | `.agents/skills/<nama>/` di proyek | `--opencode` menambah command, plugin, `opencode.json`, dan subagent hasil rakitan |
 | Claude Code tanpa plugin | salinan persis `skills/` | `.claude/skills/<nama>/` di proyek | `--init` menambah `CLAUDE.md` berisi `@AGENTS.md` |
 
-Kit proyek (`AGENTS.md`, `CONTEXT.md`, `.pawang/`, ...) dipasang oleh skill `pawang-init`. Memasang hanya `skills/` tanpa kit tidak cukup: skill membaca file itu saat berjalan.
+Kit proyek (`AGENTS.md`, `CONTEXT.md`, `.pawang/`, ...) dipasang oleh skill `pawang-init`. Memasang hanya `skills/` tanpa kit tidak cukup: skill membaca file itu saat berjalan. Update memakai manifest `.agents/pawang.lock.json` yang mencatat versi dan hash file; perintahnya ada di [`README.md`](../README.md#update), tidak diulang di sini.
 
 ## Status verifikasi
 
@@ -41,6 +41,7 @@ Catatan Pi: skill kita explicit-only (`disable-model-invocation`), yang menurut 
 | `.claude-plugin/marketplace.json` | `build-plugin.mjs` | katalog Claude Code; memuat `pawang` (source `./`) dan menautkan `pawang-skills` |
 | `.codex-plugin/plugin.json` | `build-plugin.mjs` | manifest plugin Codex |
 | `.agents/plugins/marketplace.json` | `build-plugin.mjs` | katalog Codex |
+| `skills/pawang-init/assets/VERSION` | `build-plugin.mjs` | versi yang dibaca `pawang-init` di proyek |
 | `agents/*.md` | `build-plugin.mjs` | subagent format Claude Code |
 
 Jangan edit berkas turunan dengan tangan. Ubah sumber, lalu jalankan `node scripts/build-plugin.mjs`. `validate.mjs` menggagalkan CI bila hasilnya tidak sinkron, dan `check-version.mjs` menggagalkan bila versi manifest berbeda.

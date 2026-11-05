@@ -2,6 +2,23 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Setiap rilis wajib punya bagiannya di sini; workflow rilis memakainya sebagai deskripsi GitHub Release.
 
+## [0.1.31] - 2026-11-05
+
+Update aman untuk proyek yang sudah memakai Pawang: manifest versi, diff, dan baseline.
+
+### Ditambahkan
+
+- `pawang-init --update`: menampilkan diff kit, menulis hanya file yang belum diubah lokal, dan mempertahankan file `modified`/`untracked`/`missing`.
+- `.agents/pawang.lock.json`: manifest versi dan hash file yang dikelola, ditulis oleh `pawang-init` dan installer.
+- `pawang-init --update --baseline --apply`: mencatat kondisi proyek saat ini setelah diff digabungkan, tanpa mengubah file proyek.
+- `install.mjs --update`: memperbarui skill dan kit; laporan dulu, menulis hanya dengan `--apply`.
+- `skills/pawang-init/assets/VERSION` dihasilkan dari `package.json`, jadi pawang-init yang disalin ke proyek bisa melaporkan versinya.
+
+### Diubah
+
+- Update marketplace dan installer kini punya alur yang sama: update skill, audit kit, gabungkan file lokal, lalu baseline.
+- `README.md` punya bagian **Update**; instruksi rilis dan `release-notes.mjs` menyebut perintah update.
+
 ## [0.1.30] - 2026-11-04
 
 Perbaikan dari dua putaran review: `egm-review` Stage 5-8 atas seluruh repo, lalu review isi 32 prosedur terhadap kit. Laporan keduanya ada di `repo-review.md` dan `procedure-review.md`.

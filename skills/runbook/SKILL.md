@@ -1,6 +1,6 @@
 ---
 name: runbook
-description: Turn a repeatable procedure (measurement, release readiness, manual QA pass, incident drill, migration rehearsal) into a numbered operator runbook in .pawang/runbooks/<topic>.md with exact commands, expected output, a time budget, stop conditions, and a reset. Use for /runbook or "buatkan runbook". Not for running the steps, not for a feature spec (/feature), not for session handoff (/handoff), and not for a one-feature manual check (/check guide).
+description: Turn a repeatable procedure (measurement, release readiness, manual QA, incident drill, migration rehearsal) into a numbered operator runbook in .pawang/runbooks/<topic>.md with exact commands, expected output, time budget, stop conditions, and reset. Use for /runbook or "buatkan runbook". Not for running steps, feature specs, handoff, or a one-feature manual check.
 disable-model-invocation: true
 ---
 

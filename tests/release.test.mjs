@@ -10,6 +10,7 @@ test('release-notes: versi paket punya bagian berisi plus petunjuk pasang', () =
   assert.match(r.stdout, /## Pasang/);
   assert.match(r.stdout, /\/plugin marketplace add acme\/demo/);
   assert.match(r.stdout, /pi install git:github\.com\/acme\/demo/);
+  assert.match(r.stdout, /Update:.*--update/);
   assert.doesNotMatch(r.stdout, /^## \[/m); // hanya satu bagian
 });
 

@@ -1,6 +1,6 @@
 # Berkontribusi
 
-1. Ubah sumber di `skills/` (atau `scripts/`), bukan berkas turunan (`agents/`, manifest, katalog marketplace). Rujuk berkas skill lewat `<skill-dir>`, bukan `.agents/skills/<skill>/`.
+1. Ubah sumber di `skills/` (atau `scripts/`), bukan berkas turunan (`agents/`, manifest, katalog marketplace, `skills/pawang-init/assets/VERSION`). Rujuk berkas skill lewat `<skill-dir>`, bukan `.agents/skills/<skill>/`.
 2. Jalankan:
    ```sh
    node scripts/build-plugin.mjs

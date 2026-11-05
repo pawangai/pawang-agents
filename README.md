@@ -96,7 +96,7 @@ node scripts/install.mjs --project /path/ke/proyek --init --opencode
 node scripts/install.mjs --global --target both
 ```
 
-Lalu pasang dua dependensi eksternal di atas. Opsi: `--skills a,b,c` (sebagian saja), `--force` (timpa skill yang sudah ada), `--dry-run`. Installer menyalin skill apa adanya dan tidak menimpa skill yang sudah ada kecuali `--force`; kit proyek tidak pernah menimpa file yang ada.
+Lalu pasang dua dependensi eksternal di atas. Opsi: `--skills a,b,c` (sebagian saja), `--force` (timpa skill yang sudah ada), `--dry-run`. Installer menyalin skill apa adanya dan tidak menimpa skill yang sudah ada kecuali `--force`; pemasangan awal kit proyek juga tidak menimpa file yang ada. Untuk update, lihat bagian [Update](#update).
 
 Pemasangan lewat CLI generik (`npx skills add pawangai/pawang-agents`) juga bisa, karena struktur `skills/<nama>/SKILL.md` standar; jalankan `pawang-init` sesudahnya untuk memasang kit.
 
@@ -115,6 +115,36 @@ Semua skill kecuali `agents-md` dan `pawang-init` berisi `disable-model-invocati
 ### Aplikasi chat (claude.ai)
 
 Tidak ada paket zip per skill. Aplikasi chat tidak punya marketplace berbasis URL, dan Pawang dirancang untuk agent yang bekerja di dalam repo git (membaca `AGENTS.md`, membuat branch, commit, menjalankan test), jadi alur utamanya tidak berguna di sana. Kalau tetap perlu satu skill di aplikasi chat, zip folder `skills/<nama>/` secara manual dan unggah di Settings, Capabilities, Skills.
+
+## Update
+
+Perbarui skill lebih dulu, lalu kit proyek. Kit memakai manifest `.agents/pawang.lock.json`: file yang belum diubah lokal boleh diganti, file yang diubah lokal tidak pernah ditimpa.
+
+**Marketplace**
+
+- Claude Code: `/plugin marketplace update pawang-agents`, lalu jalankan `/pawang:pawang-init update` di proyek.
+- Codex: `codex plugin marketplace upgrade pawang-agents`, lalu jalankan `pawang-init update` lewat agent.
+- Pi: pasang ulang `pi install git:github.com/pawangai/pawang-agents`, lalu `/reload`; jalankan `/skill:pawang-init update` di proyek.
+
+**Installer**
+
+```sh
+cd pawang-agents && git pull
+
+# 1. laporan + diff, tidak menulis
+node scripts/install.mjs --project /path/ke/proyek --update
+
+# 2. tulis skill dan perubahan kit yang aman
+node scripts/install.mjs --project /path/ke/proyek --update --apply
+```
+
+Pakai flag yang sama seperti pemasangan awal (`--target claude`, `--opencode`, atau `--claude`) agar skill dan subagent di lokasi itu ikut diperbarui. Update menimpa salinan skill karena skill adalah berkas terkelola; jangan menyimpan perubahan lokal di folder skill. File proyek yang `modified`, `untracked`, atau `missing` dipertahankan dan ditampilkan diff-nya. Gabungkan lewat `/agents-md` atau `/adopt`, lalu catat baseline:
+
+```sh
+node scripts/install.mjs --project /path/ke/proyek --update --baseline --apply
+```
+
+`--baseline` hanya menulis manifest; tidak mengubah berkas proyek. Proyek yang dipasang sebelum manifest ada akan melihat file lamanya sebagai `untracked` pada update pertama: baca diff, gabungkan, baru baseline. Jangan menyalin seluruh file baru di atas file lama tanpa membaca diff. Commit `.agents/pawang.lock.json` bersama hasil update agar tim memakai baseline yang sama.
 
 ## Daftar skill
 
@@ -140,14 +170,15 @@ skills/agents/
   scripts/render.mjs        rakit templat jadi berkas agent; satu sumber izin subagent
   scripts/install-agents.mjs  pasang subagent ke .opencode/agents proyek (dry-run default)
 skills/pawang-init/
-  scripts/init.mjs          pasang kit ke proyek (dry-run default)
+  scripts/init.mjs          pasang atau perbarui kit (dry-run default; update dengan --update)
   assets/kit/               AGENTS.md, CONTEXT.md, DESIGN.md, .pawang/, .agents/pawang.json
+  assets/VERSION            versi yang dibaca pawang-init (HASIL BUILD dari package.json)
   assets/opencode/          .opencode/{commands,plugins}, opencode.json (subagent dirakit dari skill agents)
 agents/                     subagent format Claude Code (HASIL BUILD dari skills/agents/assets/agents)
 .claude-plugin/             plugin.json dan marketplace.json Claude Code (HASIL BUILD)
 .codex-plugin/              plugin.json Codex (HASIL BUILD)
 .agents/plugins/            marketplace.json Codex (HASIL BUILD)
-scripts/install.mjs         pasang skill ke .agents/skills atau .claude/skills
+scripts/install.mjs         pasang atau perbarui skill dan kit (.agents/skills atau .claude/skills)
 scripts/build-plugin.mjs    bangun agents/ dan semua manifest dari sumber
 scripts/pack.mjs            ZIP runtime reproducible + SHA256SUMS.txt untuk rilis
 scripts/validate.mjs        cek frontmatter, kebebasan lokasi, command OpenCode, berkas turunan, lisensi
@@ -169,8 +200,8 @@ Rilis dibuat oleh `.github/workflows/release.yml` saat tag `vMAJOR.MINOR.PATCH` 
 # 1. Ubah "version" di package.json (satu-satunya sumber versi), tulis bagian "## [versi] - tanggal" di CHANGELOG.md, lalu bangun ulang manifest:
 node scripts/build-plugin.mjs
 # 2. Commit, beri tag, dorong:
-git add -A && git commit -m "chore: release 0.1.30"
-git tag v0.1.30
+git add -A && git commit -m "chore: release 0.1.31"
+git tag v0.1.31
 git push origin main v0.1.30
 ```
 
@@ -180,7 +211,7 @@ Workflow memastikan format tag valid dan sama dengan versi di `package.json` ser
 - `pawang-agents-codex-<versi>.zip`: manifest Codex, `agents/`, `skills/`, `LICENSE`
 - `SHA256SUMS.txt`
 
-ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex).
+ZIP hanya berisi runtime (tanpa `scripts/`, `tests/`, `docs/`) dan dibangun reproducible (urutan berkas dan waktu tetap; ada tesnya). Tag dengan tanda hubung (mis. `v0.2.0-rc.1`) menjadi pre-release. Pengguna marketplace menerima versi baru lewat `/plugin marketplace update pawang-agents` (Claude Code) atau `codex plugin marketplace upgrade pawang-agents` (Codex). Pengguna installer menjalankan `node scripts/install.mjs --project <proyek> --update` dari checkout terbaru, lalu `--apply`; kit memakai `.agents/pawang.lock.json` dan tidak menimpa file yang diubah lokal.
 
 ## Asal-usul
 

@@ -27,5 +27,6 @@ console.log(`${body}
 - Codex: \`codex plugin marketplace add ${repo}\`, lalu \`codex plugin add pawang@pawang-agents\`
 - Pi: \`pi install git:github.com/${repo}\`
 - Manual: \`node scripts/install.mjs --project <proyek> --init\`
+- Update: \`/plugin marketplace update pawang-agents\` (Claude Code), \`codex plugin marketplace upgrade pawang-agents\` (Codex), atau \`node scripts/install.mjs --project <proyek> --update\` lalu \`--apply\`
 
 Skill \`interview\`, \`pawang-skill-creator\`, dan \`plans-prototype\` datang dari [pawangai/pawang-skills](https://github.com/pawangai/pawang-skills). Aset rilis: dua ZIP runtime (Claude Code dan Codex) dan \`SHA256SUMS.txt\`.`);

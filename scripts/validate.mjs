@@ -4,13 +4,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { EXTERNAL, AUTO_INVOKE, walk, parseFrontmatter } from './lib.mjs';
+import { EXTERNAL, AUTO_INVOKE, walk, parseFrontmatter, version } from './lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, 'skills');
 const errors = [];
 const err = (m) => errors.push(m);
 const names = fs.readdirSync(SKILLS).filter((n) => fs.statSync(path.join(SKILLS, n)).isDirectory()).sort();
+{
+  const f = path.join(SKILLS, 'pawang-init', 'assets', 'VERSION');
+  const expected = version();
+  if (!fs.existsSync(f)) err('skills/pawang-init/assets/VERSION hilang; jalankan node scripts/build-plugin.mjs');
+  else if (fs.readFileSync(f, 'utf8').trim() !== expected) err(`skills/pawang-init/assets/VERSION tidak sama dengan package.json (${expected})`);
+}
 
 for (const n of names) {
   const f = path.join(SKILLS, n, 'SKILL.md');

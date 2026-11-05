@@ -5,6 +5,7 @@
 //   .claude-plugin/marketplace.json   katalog Claude Code
 //   .codex-plugin/plugin.json         manifest plugin Codex
 //   .agents/plugins/marketplace.json  katalog Codex
+//   skills/pawang-init/assets/VERSION versi yang dibaca pawang-init di proyek
 // skills/ dipakai apa adanya oleh semua harness; tidak ada salinan atau penulisan ulang path.
 //   node scripts/build-plugin.mjs           tulis keluaran
 //   node scripts/build-plugin.mjs --check   gagal bila hasil commit tidak sama dengan hasil build (dipakai CI)
@@ -124,6 +125,9 @@ export function build() {
     interface: { displayName: 'Pawang agents' },
     plugins: [{ name: PLUGIN_NAME, source: './', policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' }, category: 'Productivity' }],
   }));
+  // Versi ikut terbawa saat skill disalin ke proyek atau plugin. Skrip pawang-init harus bisa
+  // melaporkan versi tanpa membaca package.json yang tidak ada di instalasi proyek.
+  files.set(path.join('skills', 'pawang-init', 'assets', 'VERSION'), { data: Buffer.from(v + '\n'), mode: 0o644 });
   return files;
 }
 

@@ -1,6 +1,6 @@
 ---
 name: context
-description: Create or normalize CONTEXT.md, the single source of truth for what to build. Fills placeholder sections through an interview, validates the numbered feature checklist, surfaces contradictions, and offers the initial baseline commit. Use for /context, starting a new project's spec, cleaning up CONTEXT.md, or after CONTEXT.md changes materially. Not for one feature (/feature), a bug (/fix), or prototype files (/plan).
+description: Create or normalize CONTEXT.md, the single source of truth for what to build. Fill placeholder sections through an interview, validate the numbered feature checklist, surface contradictions, and offer the initial baseline commit. Use for /context, a new project's spec, cleanup, or after material changes. Not for one feature (/feature), a bug (/fix), or prototype files (/plan).
 disable-model-invocation: true
 ---
 

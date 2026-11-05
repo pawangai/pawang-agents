@@ -1,6 +1,6 @@
 ---
 name: incident
-description: Triage a production bug or incident report (log, error, tracker URL, user complaint) without touching production. Classifies severity, routes to /debug, /fix, /rollback, or /feature, and writes an incident record. Use for /incident, production is broken, users report an error, or post-deploy regression. Not for diagnosis alone (/debug), a local failing test (/debug), or a feature that is already planned (/feature). A report that turns out to be a missing feature is routed, not refused.
+description: Triage a production bug or incident report (log, error, tracker URL, user complaint) without touching production. Classify severity, route to /debug, /fix, /rollback, or /feature, and write an incident record. Use for /incident, production is broken, user reports an error, or post-deploy regression. Not for diagnosis alone, a local failing test, or an already-planned feature.
 disable-model-invocation: true
 ---
 

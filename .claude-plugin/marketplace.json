@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Marketplace Pawang agents.",
-    "version": "0.1.30"
+    "version": "0.1.31"
   },
   "plugins": [
     {
       "name": "pawang",
       "source": "./",
       "description": "Workflow Pawang untuk agent coding: rencana, bangun, verifikasi, review, commit, dan batalkan. Jalankan skill pawang-init untuk memasang kit ke proyek.",
-      "version": "0.1.30",
+      "version": "0.1.31",
       "category": "productivity"
     },
     {

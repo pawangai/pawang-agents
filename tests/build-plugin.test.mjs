@@ -71,6 +71,10 @@ test('adapter agent: setiap path skrip yang di-emit menunjuk berkas yang ada', (
   assert.ok(seen >= 3, 'pola skrip verifier hilang dari keluaran build');
 });
 
+test('versi pawang-init ikut dibangun, tidak diedit tangan', () => {
+  assert.equal(text('skills/pawang-init/assets/VERSION'), version() + '\n');
+});
+
 test('manifest: versi sama, lisensi MIT, root repo adalah plugin', () => {
   const v = version();
   const claude = JSON.parse(text('.claude-plugin/plugin.json'));

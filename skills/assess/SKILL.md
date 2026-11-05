@@ -1,6 +1,6 @@
 ---
 name: assess
-description: Menilai apakah sebuah ide layak dibangun sebelum masuk /plan. Menangkap ide, mengumpulkan bukti (termasuk bukti yang menentang), merumuskan masalah, membandingkan 2-3 opsi konsep, lalu memutuskan go, needs-clarification, atau kill dengan alasan tertulis di .pawang/assessments/<slug>.md. Gunakan untuk /assess, "worth it nggak", "layak dibangun?", validasi ide, go/no-go, atau permintaan besar dari bos/klien sebelum CONTEXT.md ditulis. Tidak menulis kode, spec, atau rencana, dan bukan untuk bug (/debug, /fix), fitur yang sudah ada di CONTEXT.md (/feature), atau aplikasi yang sudah berjalan (/adopt).
+description: Menilai kelayakan ide sebelum /plan dengan mengumpulkan bukti, merumuskan masalah, membandingkan 2-3 opsi, lalu memutuskan go, needs-clarification, atau kill di .pawang/assessments/<slug>.md. Gunakan untuk /assess, validasi ide, go/no-go, atau permintaan besar sebelum CONTEXT.md. Bukan untuk bug (/debug, /fix), fitur yang sudah direncanakan (/feature), atau proyek berjalan (/adopt).
 disable-model-invocation: true
 ---
 

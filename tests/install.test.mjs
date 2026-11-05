@@ -83,3 +83,52 @@ test('--init memasang kit dan --dry-run tidak menulis', () => {
   run('scripts/install.mjs', ['--project', e, ...base, '--init', '--dry-run']);
   assert.equal(fs.readdirSync(e).length, 0);
 });
+
+test('--update hanya laporan sampai --apply', () => {
+  const d = tmp();
+  run('scripts/install.mjs', ['--project', d, ...base, '--init']);
+  const skill = path.join(d, '.agents/skills/advise/SKILL.md');
+  fs.writeFileSync(skill, 'diubah lokal');
+  const report = run('scripts/install.mjs', ['--project', d, ...base, '--update']);
+  assert.equal(report.status, 0, report.stderr);
+  assert.match(report.stdout, /Pawang .* -> /);
+  assert.match(report.stdout, /akan diperbarui/);
+  assert.equal(fs.readFileSync(skill, 'utf8'), 'diubah lokal');
+
+  const applied = run('scripts/install.mjs', ['--project', d, ...base, '--update', '--apply']);
+  assert.equal(applied.status, 0, applied.stderr);
+  assert.equal(fs.readFileSync(skill, 'utf8'), read(ROOT, 'skills/advise/SKILL.md'));
+  assert.ok(fs.existsSync(path.join(d, '.agents/pawang.lock.json')));
+});
+
+test('--apply dan --baseline ditolak tanpa --update', () => {
+  const apply = run('scripts/install.mjs', ['--project', tmp(), ...base, '--apply']);
+  assert.equal(apply.status, 1);
+  assert.match(apply.stderr, /--apply hanya dipakai bersama --update/);
+  const baseline = run('scripts/install.mjs', ['--project', tmp(), ...base, '--baseline']);
+  assert.equal(baseline.status, 1);
+  assert.match(baseline.stderr, /--baseline hanya dipakai bersama --update/);
+});
+
+test('--update --apply memperbarui subagent OpenCode', () => {
+  const d = tmp();
+  fs.writeFileSync(path.join(d, 'package.json'), JSON.stringify({ scripts: { test: 'x', build: 'y' } }));
+  run('scripts/install.mjs', ['--project', d, ...base, '--init', '--opencode']);
+  const f = path.join(d, '.opencode/agents/verifier.md');
+  fs.writeFileSync(f, 'diubah lokal');
+  const r = run('scripts/install.mjs', ['--project', d, ...base, '--update', '--apply']);
+  assert.equal(r.status, 0, r.stderr);
+  assert.notEqual(fs.readFileSync(f, 'utf8'), 'diubah lokal');
+  assert.ok(fs.existsSync(path.join(d, '.agents/pawang.lock.json')));
+});
+
+test('--update tanpa --target mengikuti lokasi skill yang ada', () => {
+  const d = tmp();
+  run('scripts/install.mjs', ['--project', d, '--target', 'claude', ...base, '--init']);
+  const f = path.join(d, '.claude/skills/advise/SKILL.md');
+  fs.writeFileSync(f, 'diubah lokal');
+  const r = run('scripts/install.mjs', ['--project', d, ...base, '--update', '--apply']);
+  assert.equal(r.status, 0, r.stderr);
+  assert.notEqual(fs.readFileSync(f, 'utf8'), 'diubah lokal');
+  assert.ok(!fs.existsSync(path.join(d, '.agents/skills')), 'tidak boleh membuat target agents');
+});

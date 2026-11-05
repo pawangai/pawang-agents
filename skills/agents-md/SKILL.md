@@ -1,6 +1,6 @@
 ---
 name: agents-md
-description: Menulis, merapikan, atau memecah AGENTS.md menjadi indeks pendek yang menautkan ke file standar di root dan `.pawang/`, serta membuat AGENTS.md per folder monorepo. Gunakan saat user minta membuat AGENTS.md, AGENTS.md terlalu panjang atau tautannya rusak, atau ingin menekan biaya token konteks. Jangan untuk membuat atau mereview skill (itu pawang-skill-creator).
+description: Menulis, merapikan, atau memecah AGENTS.md dan `.pawang/rules.md` menjadi indeks pendek dengan tautan berpemicu, serta membuat AGENTS.md per folder monorepo. Gunakan saat user minta membuat atau merapikan AGENTS.md, ada temuan docs-health, file terlalu panjang, tautan rusak, atau ingin menekan biaya token. Jangan untuk membuat atau mereview skill (itu pawang-skill-creator).
 ---
 
 > **Paths:** `<skill-dir>` is the folder that contains this `SKILL.md`; sibling skills are at `<skill-dir>/../<name>/`. Resolve it before running a script or opening another file. When the skill is installed inside the project (for example `.agents/skills/<name>/`), use the project-relative path so permission patterns match.
@@ -74,7 +74,7 @@ AGENTS.md
 ### Aturan memecah
 - Pecah per AREA TUGAS (database, api, ui), bukan per topik kecil. Terlalu banyak file kecil membuat agent membuka banyak file satu per satu.
 - Ukuran ideal satu file docs: 50-150 baris. File di atas 100 baris diawali daftar isi (satu baris per heading utama) di bagian paling atas, karena agent sering hanya membaca sekitar 100 baris pertama untuk memutuskan apakah file itu berguna; dengan daftar isi agent bisa membaca semuanya atau langsung lompat ke bagian yang dibutuhkan.
-- Maksimal dua lompatan: AGENTS.md -> file docs. Tautkan setiap file docs langsung dari AGENTS.md, jangan sampai ada file yang hanya bisa dicapai lewat file docs lain, karena file di ujung rantai cenderung hanya dibaca sebagian. `.pawang/README.md` sebagai indeks kedua hanya dipakai bila tautannya tidak muat di AGENTS.md, dan jangan lebih dalam dari itu.
+- Maksimal dua lompatan: AGENTS.md -> file docs. Tautkan setiap file docs langsung dari AGENTS.md, jangan sampai ada file yang hanya bisa dicapai lewat file docs lain, karena file di ujung rantai cenderung hanya dibaca sebagian. Pengecualian: subfile di bawah indeks standar (`.pawang/README.md`, `.pawang/workflow.md`, `.pawang/rules.md`); daftarkan folder induknya di tabel **Project files** agar `docs-health` tidak menandainya yatim. `.pawang/README.md` sebagai indeks kedua hanya dipakai bila tautannya tidak muat di AGENTS.md, dan jangan lebih dalam dari itu.
 - Jangan pakai sintaks impor otomatis (`@path`) untuk file yang seharusnya dibaca sesuai kebutuhan, karena ikut dimuat setiap sesi. Pakai path biasa dalam backtick. Pengecualian: `CLAUDE.md` berisi `@AGENTS.md` (lihat Target agent).
 
 ### Template keputusan (ADR singkat)
@@ -106,18 +106,43 @@ Status wajib ada. Tanpa itu agent tidak tahu keputusan mana yang masih berlaku.
    Barisnya tetap di AGENTS.md sebagai penjelasan. Skill ini hanya merekomendasikan dan menyebutnya saat serah-terima; mengubah `opencode.json` atau menulis plugin butuh persetujuan user dan dikerjakan terpisah.
 6. **Persetujuan.** Tampilkan ringkasan perubahan (yang ditulis, yang dipindah, yang dihapus) sebelum menimpa AGENTS.md yang sudah berisi. Jangan menghapus baris tanpa menyebutnya.
 7. **Verifikasi:**
-   - `node <skill-dir>/../advise/scripts/docs-health.mjs "<path-proyek>"`: ukuran, tautan rusak atau tanpa pemicu, dokumen yatim.
+   - `node <skill-dir>/../advise/scripts/docs-health.mjs "<path-proyek>"`: ukuran, tautan rusak atau tanpa pemicu, dokumen yatim. Tindak lanjuti ERROR dan WARN memakai bagian **Perbaikan temuan docs-health**; INFO dicatat, tidak wajib diperbaiki.
    - Semua perintah valid.
    - Semua path dalam backtick menunjuk ke file atau folder yang ada. Jalankan dari root proyek. Glob dan placeholder (`*`, `<modul>`) diabaikan; folder yang memang direncanakan dicatat sebagai pengecualian. Perintah di bawah hanya menangkap path yang mengandung `/`, jadi untuk path satu segmen (`CONTEXT.md`, `README.md`, `design-tokens.json`) pakai `docs-health.mjs`, yang sudah memeriksa setiap backtick:
      `grep -oE '`[A-Za-z0-9_.-]+/[^` ]*`' AGENTS.md | tr -d '`' | grep -vE '[*<>]' | xargs -I{} sh -c 'test -e "{}" || echo "HILANG: {}"'`
    - Tidak ada duplikasi antara AGENTS.md, README, dan .pawang/.
-   - Setiap file di `.pawang/` di atas 100 baris punya daftar isi di bagian atas, dan setiap file docs ditautkan langsung dari AGENTS.md (atau dari `.pawang/README.md` bila indeks kedua dipakai).
+   - Setiap file di `.pawang/` di atas 100 baris punya daftar isi di bagian atas, file di atas 200 baris sudah dipecah, dan setiap file docs ditautkan langsung dari AGENTS.md atau dari indeks standar (`.pawang/README.md`, `.pawang/rules.md`, `.pawang/workflow.md`).
    - Aturan atribusi, tabel Project files, Proportional engineering, Communication, Commits, `## Commands`, dan `## Repository layout` masih ada, dan setiap file di tabel Project files benar-benar ada.
    - Section **Prinsip kerja** ada, 4 baris (kurang hanya bila sebuah baris dihapus lewat uji dan dicatat di `.pawang/decisions/`), dan tidak bertentangan dengan konvensi proyek yang sudah diputuskan user.
    - **Cara kerja** (maksimal 5 baris) hanya menyebut nama subagent atau skill yang ada di agent target; untuk banyak agent, pakai istilah peran.
    - **Batas** memuat Jangan dan Tanya dulu, satu baris per item.
    Kalau ada pemeriksaan yang gagal, perbaiki lalu jalankan ulang seluruh daftar ini dari awal sampai lolos, maksimal 2 putaran. Setelah itu serahkan dengan temuan yang tersisa disebutkan, jangan dinyatakan lolos. Kalau Node atau skrip `docs-health.mjs` tidak tersedia, lewati baris itu, periksa ukuran, tautan rusak, dan dokumen yatim secara manual, dan sebut hal itu saat serah-terima.
 8. **Serahkan** dengan satu kalimat tentang apa yang ditulis dan apa yang dipindah, plus aturan mana yang sebaiknya ditegakkan lewat `permission` atau plugin hook. Sarankan `/advise` untuk audit drift setelah perubahan arsitektur, pemindahan folder, atau penggantian database atau library utama.
+
+## Perbaikan temuan docs-health
+
+`docs-health` hanya melaporkan. Perbaiki ERROR dan WARN, catat INFO, lalu jalankan ulang audit. Petakan temuannya ke tindakan berikut.
+
+| Temuan | Tindakan |
+| --- | --- |
+| `AGENTS.md` root di atas 100 atau 150 baris | Pindahkan section yang spesifik area ke `.pawang/conventions/<area>.md` atau `.pawang/rules/<area>.md`. Ganti dengan satu baris tautan berpemicu. Pertahankan **Cara kerja**, **Prinsip kerja**, **Batas**, `## Commands`, `## Repository layout`, dan tabel **Project files**. |
+| AGENTS.md bersarang di atas 60 atau 100 baris | Sisakan perintah folder, larangan, dan jebakan. Pindahkan konteks, riwayat, atau prosedur rinci ke `.pawang/...`, tautkan dengan pemicu, dan hapus bagian yang mengulang root. |
+| `.pawang/*.md` di atas 200 baris | Pecah per area tugas; file asal menjadi indeks pendek. Untuk `rules.md`, pakai prosedur di bawah. |
+| Dokumen `.pawang/` yatim | Tautkan dari peta dokumen `AGENTS.md` atau `.pawang/README.md` memakai path lengkap `.pawang/...` dan pemicu. Kalau tidak dipakai lagi, arsipkan. |
+| Tautan rusak | Perbaiki path ke target yang ada; kalau target memang dihapus, hapus barisnya. |
+| Tautan tanpa pemicu | Tambahkan "baca saat ..." atau "baca sebelum ..." pada baris yang sama. |
+| Duplikasi bagian root di AGENTS.md bersarang | Hapus dari file bersarang; aturan root tetap berlaku. |
+
+### Memecah rules.md menjadi indeks
+
+Dipakai bila `docs-health` menandai `.pawang/rules.md` di atas 200 baris. Pecah per area tugas, bukan per heading.
+
+1. Baca penuh. Kelompokkan heading ke area: commit dan branch, review, workflow, komunikasi dan format output, serta aturan yang selalu berlaku.
+2. Pindahkan isi tiap area apa adanya ke `.pawang/rules/<area>.md` (misalnya `commits.md`, `review.md`, `workflow.md`). Beri H1 dan satu baris pemicu "baca saat ..." atau "baca sebelum ...".
+3. Sisakan di `rules.md`: tujuan satu paragraf, aturan yang tidak boleh hilang saat file hanya dibaca sebagian (persetujuan commit, larangan atribusi AI, verifikasi sebelum selesai), dan tabel indeks berisi file, isi, dan pemicu.
+4. Daftarkan `.pawang/rules/` di tabel **Project files** dan `.pawang/README.md`; ubah baris `rules.md` menjadi indeks aturan per area.
+5. Perbarui rujukan yang menjanjikan teks lengkap di `rules.md` (misalnya `.pawang/workflow.md`) agar menunjuk subfile area yang tepat.
+6. Jalankan `docs-health` lagi. Subfile harus tertaut dari `AGENTS.md` atau `.pawang/README.md`; kalau tidak, docs-health menandainya yatim.
 
 ## Menguji baris perilaku
 
